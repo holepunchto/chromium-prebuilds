@@ -1,0 +1,11 @@
+shared_library("chromium-prebuild") {
+  public_deps = [
+    "//content/public/app",
+    "//content/public/browser",
+    "//content/public/child",
+    "//content/public/common",
+    "//content/public/gpu",
+    "//content/public/renderer",
+    "//content/public/utility",
+  ]
+}
