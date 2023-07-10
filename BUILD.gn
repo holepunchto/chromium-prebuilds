@@ -6,24 +6,29 @@ group("prebuilds") {
   deps = []
 
   if (is_prebuild == "v8") {
-    deps += [":v8-prebuild"]
+    deps += [":v8"]
   }
 
   if (is_prebuild == "content") {
-    deps += [":content-prebuild"]
+    deps += [":content"]
   }
 }
 
 if (is_prebuild == "v8") {
-  static_library("v8-prebuild") {
+  static_library("v8") {
+    complete_static_lib = true
+
     public_deps = [
-      "//v8:v8_monolith",
+      "//v8:v8",
+      "//v8:v8_libplatform",
     ]
   }
 }
 
 if (is_prebuild == "content") {
-  shared_library("content-prebuild") {
+  static_library("content") {
+    complete_static_lib = true
+
     public_deps = [
       "//content/public/app",
       "//content/public/browser",
