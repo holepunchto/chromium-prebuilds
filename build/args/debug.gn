@@ -1,0 +1,7 @@
+is_debug = true
+strip_debug_info = false
+symbol_level = 2
+
+# Enable split DWARF debug info files, which is necessary for non-component
+# builds in debug mode.
+use_debug_fission = true

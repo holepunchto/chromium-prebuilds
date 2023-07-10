@@ -1,11 +1,25 @@
-shared_library("chromium-prebuild") {
-  public_deps = [
-    "//content/public/app",
-    "//content/public/browser",
-    "//content/public/child",
-    "//content/public/common",
-    "//content/public/gpu",
-    "//content/public/renderer",
-    "//content/public/utility",
-  ]
+declare_args() {
+  is_prebuild = false
+}
+
+if (is_prebuild == "v8") {
+  static_library("v8-prebuild") {
+    public_deps = [
+      "//v8:v8_monolith",
+    ]
+  }
+}
+
+if (is_prebuild == "content") {
+  shared_library("content-prebuild") {
+    public_deps = [
+      "//content/public/app",
+      "//content/public/browser",
+      "//content/public/child",
+      "//content/public/common",
+      "//content/public/gpu",
+      "//content/public/renderer",
+      "//content/public/utility",
+    ]
+  }
 }

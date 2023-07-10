@@ -1,0 +1,3 @@
+is_debug = false
+strip_debug_info = true
+symbol_level = 0

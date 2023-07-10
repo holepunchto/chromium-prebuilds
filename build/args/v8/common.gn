@@ -1,0 +1,11 @@
+# Disable loading of external startup data as it is not supported on all
+# platforms. Startup data can still be embedded in binaries.
+v8_use_external_startup_data = false
+
+# Disable GDB JIT, which is an interface used to improve stack traces in JIT'ed
+# code. See https://v8.dev/docs/gdb-jit for more information.
+v8_enable_gdbjit = false
+
+# Disable i18n support, including the `Intl` APIs. This produces a significantly
+# smaller archive.
+v8_enable_i18n_support = false

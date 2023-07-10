@@ -1,0 +1,4 @@
+# Don't use the bundled Clang on Windows as V8 requires MSVC-specific
+# overrides to ensure C++17 compatibility. This might change when V8 becomes
+# C++20 compatible.
+is_clang = false

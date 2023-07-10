@@ -1,0 +1,13 @@
+is_prebuild = "v8"
+
+import("common.gn")
+import("v8/common.gn")
+
+# Create a monolithic build of V8, which will result in a single static archive
+# for easy embedding.
+v8_monolithic = true
+
+# Disable pointer compression which in turn also disables the memory sandbox.
+# We use a custom allocator with an optional secure mode that provides more
+# safety than the V8 virtual address space.
+v8_enable_pointer_compression = false
