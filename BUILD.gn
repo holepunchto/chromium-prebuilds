@@ -2,6 +2,18 @@ declare_args() {
   is_prebuild = false
 }
 
+group("prebuilds") {
+  deps = []
+
+  if (is_prebuild == "v8") {
+    deps += [":v8-prebuild"]
+  }
+
+  if (is_prebuild == "content") {
+    deps += [":content-prebuild"]
+  }
+}
+
 if (is_prebuild == "v8") {
   static_library("v8-prebuild") {
     public_deps = [

@@ -1,7 +1,7 @@
-is_prebuild = "v8"
-
 import("common.gn")
 import("v8/common.gn")
+
+is_prebuild = "v8"
 
 # Create a monolithic build of V8, which will result in a single static archive
 # for easy embedding.

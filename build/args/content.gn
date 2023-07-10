@@ -1,4 +1,4 @@
-is_prebuild = "content"
-
 import("common.gn")
 import("v8/common.gn")
+
+is_prebuild = "content"
