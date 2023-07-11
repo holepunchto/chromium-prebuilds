@@ -2,19 +2,12 @@ declare_args() {
   is_prebuild = false
 }
 
-group("prebuilds") {
-  deps = [":c++"]
-
-  if (is_prebuild == "v8") {
-    deps += [":v8"]
-  }
-
-  if (is_prebuild == "content") {
-    deps += [":content"]
-  }
-}
-
 source_set("c++") {
+  visibility = [
+    ":v8",
+    ":content",
+  ]
+
   public_deps = [
     "//buildtools/third_party/libc++",
   ]
@@ -48,5 +41,17 @@ if (is_prebuild == "content") {
       "//content/public/renderer",
       "//content/public/utility",
     ]
+  }
+}
+
+group("prebuilds") {
+  deps = []
+
+  if (is_prebuild == "v8") {
+    deps += [":v8"]
+  }
+
+  if (is_prebuild == "content") {
+    deps += [":content"]
   }
 }
