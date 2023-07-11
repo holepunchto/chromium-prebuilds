@@ -9,7 +9,7 @@ index 21421aa320..24d3de5d3c 100644
    visibility = [
      "//build/config:common_deps",
      "//third_party/catapult/devil:devil",
-+    "//prebuilds:libc++",
++    "//prebuilds:c++",
    ]
    if (is_linux) {
      # This target packages libc++.so, so must have an explicit dependency on
