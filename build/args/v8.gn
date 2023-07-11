@@ -3,6 +3,9 @@ import("v8/common.gn")
 
 is_prebuild = "v8"
 
+# Expose V8 symbols to allow depending on them externally.
+v8_expose_symbols = true
+
 # Disable pointer compression which in turn also disables the memory sandbox.
 # We use a custom allocator with an optional secure mode that provides more
 # safety than the V8 virtual address space.

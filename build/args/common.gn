@@ -6,7 +6,3 @@ root_extra_deps = ["//prebuilds"]
 # Don't perform a component build as we're interested in bundling everything
 # into single archives.
 is_component_build = false
-
-# Don't use the libc++ that Chromium bundles as that will require everything
-# else to also link against it.
-use_custom_libcxx = false

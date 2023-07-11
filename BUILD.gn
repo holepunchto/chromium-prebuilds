@@ -14,6 +14,14 @@ group("prebuilds") {
   }
 }
 
+static_library("libc++") {
+  complete_static_lib = true
+
+  public_deps = [
+    "//buildtools/third_party/libc++",
+  ]
+}
+
 if (is_prebuild == "v8") {
   static_library("v8") {
     complete_static_lib = true
