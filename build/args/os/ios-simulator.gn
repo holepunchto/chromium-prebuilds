@@ -1,4 +1,3 @@
-target_os = "ios"
-target_environment = "simulator"
+import("ios.gn")
 
-ios_deployment_target = "13.4"
+target_environment = "simulator"
