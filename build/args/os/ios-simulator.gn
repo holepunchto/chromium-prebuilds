@@ -1,0 +1,3 @@
+target_environment = "simulator"
+
+ios_deployment_target = "13.4"

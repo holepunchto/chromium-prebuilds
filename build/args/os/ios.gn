@@ -1,0 +1,3 @@
+target_environment = "device"
+
+ios_deployment_target = "13.4"
