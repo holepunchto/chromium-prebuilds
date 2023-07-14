@@ -2,3 +2,7 @@ import("common.gn")
 import("v8/common.gn")
 
 is_prebuild = "content"
+
+# Don't use a separate data file for ICU, but embed it statically instead.
+# This increases executable size, but simplifies distribution.
+icu_use_data_file = false

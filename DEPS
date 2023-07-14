@@ -8,7 +8,7 @@ vars = {
 deps = {
   "src": {
     "url": Var("chromium_git") + "/chromium/src.git@" + Var("chromium_version"),
-  }
+  },
 }
 
 recursedeps = [
