@@ -24,6 +24,20 @@ gclient sync
 
 This will take a while depending on the speed of your connection.
 
+## Patching
+
+The build definitions rely on a few patches that must be manually applied after each `gclient sync`. The patches can be applied using `git`:
+
+```sh
+git apply --directory src src/prebuilds/patches/*.patch
+```
+
+Make sure to revert the patches before doing another `gclient sync` as it requires a clean working tree:
+
+```sh
+git apply --reverse --directory src src/prebuilds/patches/*.patch
+```
+
 ## License
 
 Apache-2.0
