@@ -1,4 +1,4 @@
-# Include ourselves as an extra root dependency to make the our build targets
+# Include ourselves as an extra root dependency to make our build targets
 # available to GN.
 # See https://chromium.googlesource.com/chromium/src/+/main/BUILD.gn
 root_extra_deps = ["//prebuilds"]
