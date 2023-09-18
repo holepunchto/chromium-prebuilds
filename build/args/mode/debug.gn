@@ -1,3 +1,4 @@
+is_official_build = false
 is_debug = true
 strip_debug_info = false
 symbol_level = 2

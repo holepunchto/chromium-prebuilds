@@ -1,4 +1,13 @@
+is_official_build = true
 is_debug = false
 strip_debug_info = true
 symbol_level = 0
 enable_dsyms = false
+
+# Disable profile-guided optimization (PGO) and just build everything in a
+# single pass.
+chrome_pgo_phase = 0
+
+# Disable thin link-time optimization (Thin LTO) as it increases the binary
+# size.
+use_thin_lto = false
