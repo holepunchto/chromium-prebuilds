@@ -14,7 +14,7 @@ if (is_prebuild == "v8") {
   static_library("v8") {
     complete_static_lib = true
 
-    public_deps = [
+    deps = [
       ":c++",
 
       "//v8:v8",
@@ -26,7 +26,7 @@ if (is_prebuild == "content") {
   static_library("content") {
     complete_static_lib = true
 
-    public_deps = [
+    deps = [
       ":c++",
 
       "//content/public/app",
@@ -39,7 +39,7 @@ if (is_prebuild == "content") {
     ]
 
     if (is_mac) {
-      public_deps += [
+      deps += [
         "//base/allocator:early_zone_registration_mac",
       ]
     }
@@ -50,7 +50,7 @@ if (is_prebuild == "webrtc") {
   static_library("webrtc") {
     complete_static_lib = true
 
-    public_deps = [
+    deps = [
       ":c++",
 
       "//third_party/webrtc_overrides:webrtc_component",

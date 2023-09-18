@@ -3,6 +3,9 @@
 # See https://chromium.googlesource.com/chromium/src/+/main/BUILD.gn
 root_extra_deps = ["//prebuilds"]
 
+# Only enable debug checks in non-release builds.
+dcheck_always_on = false
+
 # Don't perform a component build as we're interested in bundling everything
 # into single archives.
 is_component_build = false
