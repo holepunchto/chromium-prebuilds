@@ -3,11 +3,9 @@ declare_args() {
 }
 
 source_set("c++") {
-  visibility = [":*"]
+  visibility = [ ":*" ]
 
-  public_deps = [
-    "//buildtools/third_party/libc++",
-  ]
+  public_deps = [ "//buildtools/third_party/libc++" ]
 }
 
 if (is_prebuild == "v8") {
@@ -16,7 +14,6 @@ if (is_prebuild == "v8") {
 
     deps = [
       ":c++",
-
       "//v8:v8",
     ]
   }
@@ -28,7 +25,6 @@ if (is_prebuild == "content") {
 
     deps = [
       ":c++",
-
       "//content/public/app",
       "//content/public/browser",
       "//content/public/child",
@@ -39,9 +35,7 @@ if (is_prebuild == "content") {
     ]
 
     if (is_mac) {
-      deps += [
-        "//base/allocator:early_zone_registration_mac",
-      ]
+      deps += [ "//base/allocator:early_zone_registration_mac" ]
     }
   }
 }
@@ -52,7 +46,6 @@ if (is_prebuild == "webrtc") {
 
     deps = [
       ":c++",
-
       "//third_party/webrtc_overrides:webrtc_component",
     ]
   }
@@ -62,14 +55,14 @@ group("prebuilds") {
   deps = []
 
   if (is_prebuild == "v8") {
-    deps += [":v8"]
+    deps += [ ":v8" ]
   }
 
   if (is_prebuild == "content") {
-    deps += [":content"]
+    deps += [ ":content" ]
   }
 
   if (is_prebuild == "webrtc") {
-    deps += [":webrtc"]
+    deps += [ ":webrtc" ]
   }
 }

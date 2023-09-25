@@ -1,7 +1,7 @@
 # Include ourselves as an extra root dependency to make our build targets
 # available to GN.
 # See https://chromium.googlesource.com/chromium/src/+/main/BUILD.gn
-root_extra_deps = ["//prebuilds"]
+root_extra_deps = [ "//prebuilds" ]
 
 # Only enable debug checks in non-release builds.
 dcheck_always_on = false
