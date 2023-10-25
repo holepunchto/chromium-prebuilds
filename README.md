@@ -22,7 +22,11 @@ The `--cache-dir` argument should point to a path, such as `~/.git_cache`, that 
 gclient sync
 ```
 
-This will take a while depending on the speed of your connection.
+This will take a while depending on the speed of your connection. When completed, create a link to the fetched build tools to mark the root of the build tree:
+
+```sh
+ln -s src/buildtools buildtools
+```
 
 ## Patching
 
@@ -37,6 +41,15 @@ Make sure to revert the patches before doing another `gclient sync` as it requir
 ```sh
 git apply --reverse --directory src src/prebuilds/patches/*.patch
 ```
+
+## Cross compiling
+
+The Chromium build system supports cross compiling for variants of the same host platform, such as making both ARM and Intel Darwin builds on an ARM Darwin system. For some platforms, additional packages might be needed as documented in the following.
+
+### Linux
+
+- `ia32` and `arm` on `x64` host
+  - Packages: `gcc-multilib`
 
 ## License
 
