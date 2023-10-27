@@ -13,10 +13,10 @@ mkdir chromium && cd chromium
 Then, create a `.gclient` configuration file that will fetch this repository and its dependencies:
 
 ```sh
-gclient config --name src/prebuilds --cache-dir <path> --unmanaged git@github.com:holepunchto/chromium-prebuilds.git
+gclient config --name src/prebuilds [--cache-dir <path>] --unmanaged git@github.com:holepunchto/chromium-prebuilds.git
 ```
 
-The `--cache-dir` argument should point to a path, such as `~/.git_cache`, that will be used for caching all cloned git repositories. When finished, fetch the repository and its dependencies:
+The `--cache-dir` argument, if provided, should point to a path, such as `~/.git_cache`, that will be used for caching all cloned git repositories. When finished, fetch the repository and its dependencies:
 
 ```sh
 gclient sync
