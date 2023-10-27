@@ -25,7 +25,11 @@ gclient sync
 This will take a while depending on the speed of your connection. When completed, create a link to the fetched build tools to mark the root of the build tree:
 
 ```sh
+# POSIX
 ln -s src/buildtools buildtools
+
+# Windows
+mklink /j buildtools src\buildtools
 ```
 
 ## Patching
