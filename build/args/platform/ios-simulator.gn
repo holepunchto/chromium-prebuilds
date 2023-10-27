@@ -1,3 +1,0 @@
-import("ios.gn")
-
-target_environment = "simulator"

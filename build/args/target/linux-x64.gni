@@ -1,0 +1,2 @@
+import("../platform/linux.gni")
+import("../arch/x64.gni")

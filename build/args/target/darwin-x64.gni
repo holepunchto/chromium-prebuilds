@@ -1,0 +1,2 @@
+import("../platform/darwin.gni")
+import("../arch/x64.gni")

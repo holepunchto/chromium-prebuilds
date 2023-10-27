@@ -1,0 +1,2 @@
+import("../platform/android.gni")
+import("../arch/arm.gni")

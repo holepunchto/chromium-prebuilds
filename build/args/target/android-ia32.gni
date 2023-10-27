@@ -1,0 +1,2 @@
+import("../platform/android.gni")
+import("../arch/ia32.gni")
