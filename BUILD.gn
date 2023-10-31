@@ -2,10 +2,12 @@ declare_args() {
   is_prebuild = false
 }
 
-source_set("c++") {
+static_library("c++") {
+  complete_static_lib = true
+
   visibility = [ ":*" ]
 
-  public_deps = [ "//buildtools/third_party/libc++" ]
+  deps = [ "//buildtools/third_party/libc++" ]
 }
 
 if (is_prebuild == "v8") {
@@ -33,10 +35,6 @@ if (is_prebuild == "content") {
       "//content/public/renderer",
       "//content/public/utility",
     ]
-
-    if (is_mac) {
-      deps += [ "//base/allocator:early_zone_registration_mac" ]
-    }
   }
 }
 
