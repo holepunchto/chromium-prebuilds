@@ -2,18 +2,22 @@ declare_args() {
   is_prebuild = false
 }
 
-static_library("c++") {
-  complete_static_lib = true
+template("static_prebuild") {
+  static_library(target_name) {
+    complete_static_lib = true
+    forward_variables_from(invoker, "*", [])
+    configs -= [ "//build/config/compiler:thin_archive" ]
+  }
+}
 
+static_prebuild("c++") {
   visibility = [ ":*" ]
 
   deps = [ "//buildtools/third_party/libc++" ]
 }
 
 if (is_prebuild == "v8") {
-  static_library("v8") {
-    complete_static_lib = true
-
+  static_prebuild("v8") {
     deps = [
       ":c++",
       "//v8:v8",
@@ -22,9 +26,7 @@ if (is_prebuild == "v8") {
 }
 
 if (is_prebuild == "content") {
-  static_library("content") {
-    complete_static_lib = true
-
+  static_prebuild("content") {
     deps = [
       ":c++",
       "//content/public/app",
@@ -39,9 +41,7 @@ if (is_prebuild == "content") {
 }
 
 if (is_prebuild == "webrtc") {
-  static_library("webrtc") {
-    complete_static_lib = true
-
+  static_prebuild("webrtc") {
     deps = [
       ":c++",
       "//third_party/webrtc_overrides:webrtc_component",

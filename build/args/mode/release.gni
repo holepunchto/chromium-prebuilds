@@ -8,12 +8,5 @@ enable_dsyms = false
 # single pass.
 chrome_pgo_phase = 0
 
-# Disable thin link-time optimization (ThinLTO) as it increases the binary
-# size.
-use_thin_lto = false
-
-# Disable control flow integrity (CFI) as it relies on ThinLTO.
-is_cfi = false
-
 # Disable allowlist generation as it relies on debug info being available.
 enable_resource_allowlist_generation = false
