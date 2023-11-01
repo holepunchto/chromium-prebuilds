@@ -14,6 +14,8 @@ static_prebuild("c++") {
   visibility = [ ":*" ]
 
   deps = [ "//buildtools/third_party/libc++" ]
+
+  include_dirs = [ "//third_party/libc++/src/include" ]
 }
 
 if (is_prebuild == "v8") {
