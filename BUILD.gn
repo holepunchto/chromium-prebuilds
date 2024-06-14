@@ -39,6 +39,12 @@ if (is_prebuild == "content") {
       "//content/public/renderer",
       "//content/public/utility",
     ]
+
+    if (is_mac) {
+      deps += [
+        "//base/allocator:early_zone_registration_apple"
+      ]
+    }
   }
 }
 
