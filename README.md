@@ -46,15 +46,6 @@ Make sure to revert the patches before doing another `gclient sync` as it requir
 git apply --reverse --directory src src/prebuilds/patches/*.patch
 ```
 
-## Cross compiling
-
-The Chromium build system supports cross compiling for variants of the same host platform, such as making both ARM and Intel Darwin builds on an ARM Darwin system. For some platforms, additional packages might be needed as documented in the following.
-
-### Linux
-
-- `ia32` and `arm` on `x64` host
-  - Packages: `gcc-multilib`
-
 ## License
 
 Apache-2.0
