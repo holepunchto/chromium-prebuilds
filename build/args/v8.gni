@@ -7,6 +7,4 @@ is_prebuild = "v8"
 v8_expose_symbols = true
 
 # Disable pointer compression which in turn also disables the memory sandbox.
-# We use a custom allocator with an optional secure mode that provides more
-# safety than the V8 virtual address space.
 v8_enable_pointer_compression = false
