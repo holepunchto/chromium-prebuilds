@@ -1,3 +1,0 @@
-import("../platform/ios.gni")
-import("../arch/x64.gni")
-import("../simulator.gni")

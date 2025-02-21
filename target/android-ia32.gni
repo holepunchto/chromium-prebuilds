@@ -1,0 +1,2 @@
+import("//prebuilds/platform/android.gni")
+import("//prebuilds/arch/ia32.gni")

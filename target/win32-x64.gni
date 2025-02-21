@@ -1,0 +1,2 @@
+import("//prebuilds/platform/win32.gni")
+import("//prebuilds/arch/x64.gni")

@@ -1,0 +1,2 @@
+import("//prebuilds/platform/darwin.gni")
+import("//prebuilds/arch/x64.gni")

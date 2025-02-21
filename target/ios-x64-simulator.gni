@@ -1,0 +1,3 @@
+import("//prebuilds/platform/ios.gni")
+import("//prebuilds/arch/x64.gni")
+import("//prebuilds/simulator.gni")

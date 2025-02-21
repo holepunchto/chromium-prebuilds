@@ -1,2 +1,0 @@
-import("../platform/linux.gni")
-import("../arch/arm64.gni")

@@ -1,5 +1,5 @@
-import("common.gni")
-import("v8/common.gni")
+import("//prebuilds/common.gni")
+import("//prebuilds/v8/common.gni")
 
 is_prebuild = "v8"
 

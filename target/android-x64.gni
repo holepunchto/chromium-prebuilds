@@ -1,5 +1,5 @@
-import("../platform/android.gni")
-import("../arch/x64.gni")
+import("//prebuilds/platform/android.gni")
+import("//prebuilds/arch/x64.gni")
 
 # Don't bundle 32-bit assets with 64-bit builds.
 skip_secondary_abi_for_cq = true

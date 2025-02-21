@@ -1,0 +1,3 @@
+import("//prebuilds/common.gni")
+
+is_prebuild = "webrtc"
