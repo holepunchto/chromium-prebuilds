@@ -27,7 +27,9 @@ This will take a while depending on the speed of your connection. When completed
 ```sh
 # POSIX
 ln -s src/buildtools buildtools
+```
 
+```pwsh
 # Windows
 mklink /j buildtools src\buildtools
 ```
@@ -44,6 +46,22 @@ Make sure to revert the patches before doing another `gclient sync` as it requir
 
 ```sh
 git apply --reverse --directory src src/prebuilds/patches/*.patch
+```
+
+## Building
+
+```sh
+# POSIX
+gn gen out/<target>/<module> --args="import(\"//prebuilds/<module>.gni\") import(\"//prebuilds/mode/<release|debug>.gni\") import(\"//prebuilds/target/<target>.gni\")"
+```
+
+```pwsh
+# Windows
+gn gen out/<target>/<module> --args="import(\`"//prebuilds/<module>.gni\`") import(\`"//prebuilds/mode/<release|debug>.gni\`") import(\`"//prebuilds/target/<target>.gni\`")"
+```
+
+```sh
+ninja -C out/<target>/<module> prebuilds
 ```
 
 ## License
