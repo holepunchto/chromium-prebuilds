@@ -36,16 +36,16 @@ mklink /j buildtools src\buildtools
 
 ## Patching
 
-The build definitions rely on a few patches that must be manually applied after each `gclient sync`. The patches can be applied using `git`:
+The build definitions rely on a few patches that must be manually applied after each `gclient sync`. The patches are separated by submodule and can be applied using `git`:
 
 ```sh
-git apply --directory src src/prebuilds/patches/*.patch
+git apply --directory src[/<submodule>] src/prebuilds/patches[/<submodule>]/*.patch
 ```
 
 Make sure to revert the patches before doing another `gclient sync` as it requires a clean working tree:
 
 ```sh
-git apply --reverse --directory src src/prebuilds/patches/*.patch
+git apply --reverse --directory src[/<submodule>] src/prebuilds/patches[/<submodule>]/*.patch
 ```
 
 ## Building
