@@ -16,7 +16,7 @@ Then, create a `.gclient` configuration file that will fetch this repository and
 gclient config --name src/prebuilds [--cache-dir <path>] --unmanaged git@github.com:holepunchto/chromium-prebuilds.git
 ```
 
-The `--cache-dir` argument, if provided, should point to a path, such as `~/.git_cache`, that will be used for caching all cloned git repositories. When finished, fetch the repository and its dependencies:
+The `--cache-dir` argument, if provided, should point to a path, such as `~/.git_cache/`, that will be used for caching all cloned git repositories. When finished, fetch the repository and its dependencies:
 
 ```sh
 gclient sync
@@ -50,6 +50,14 @@ git apply --reverse --directory src[/<submodule>] src/prebuilds/patches[/<submod
 
 ## Building
 
+To build the various Chromium modules, start by changing into the `src/` directory:
+
+```sh
+cd src
+```
+
+Next, generate a build system using `gn` for your desired target and module, replacing `<target>` with one of the supported targets as defined by [`target/`](target/) and `<module>` with one of `v8`, `content`, or `webrtc`:
+
 ```sh
 # POSIX
 gn gen out/<target>/<module> --args="import(\"//prebuilds/<module>.gni\") import(\"//prebuilds/mode/<release|debug>.gni\") import(\"//prebuilds/target/<target>.gni\")"
@@ -59,6 +67,24 @@ gn gen out/<target>/<module> --args="import(\"//prebuilds/<module>.gni\") import
 # Windows
 gn gen out/<target>/<module> --args="import(\`"//prebuilds/<module>.gni\`") import(\`"//prebuilds/mode/<release|debug>.gni\`") import(\`"//prebuilds/target/<target>.gni\`")"
 ```
+
+> [!TIP]
+>
+> #### Examples
+>
+> To make a release build of V8 for Linux 64-bit ARM, do:
+>
+> ```sh
+> gn gen out/linux-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-arm64.gni\")"
+> ```
+>
+> To make a release build of V8 for Windows 64-bit Intel, do:
+>
+> ```sh
+> gn gen out/win32-x64/v8 --args="import(\`"//prebuilds/v8.gni\`") import(\`"//prebuilds/mode/release.gni\`") import(\`"//prebuilds/target/win32-x64.gni\`")"
+> ```
+
+Finally, run the build system for the `prebuilds` target:
 
 ```sh
 ninja -C out/<target>/<module> prebuilds
