@@ -52,7 +52,6 @@ git apply --reverse --directory src[/<submodule>] src/prebuilds/patches[/<submod
 
 ```sh
 # POSIX
-
 gn gen out/<target>/<module> --args="import(\"//prebuilds/<module>.gni\") import(\"//prebuilds/mode/<release|debug>.gni\") import(\"//prebuilds/target/<target>.gni\")"
 ```
 
