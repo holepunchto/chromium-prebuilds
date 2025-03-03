@@ -52,6 +52,7 @@ git apply --reverse --directory src[/<submodule>] src/prebuilds/patches[/<submod
 
 ```sh
 # POSIX
+
 gn gen out/<target>/<module> --args="import(\"//prebuilds/<module>.gni\") import(\"//prebuilds/mode/<release|debug>.gni\") import(\"//prebuilds/target/<target>.gni\")"
 ```
 
@@ -62,6 +63,13 @@ gn gen out/<target>/<module> --args="import(\`"//prebuilds/<module>.gni\`") impo
 
 ```sh
 ninja -C out/<target>/<module> prebuilds
+```
+
+_example dummies:_
+```
+cd src/
+gn gen out/linux-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-x64.gni\")"
+ninja -C out/linux-x64/v8
 ```
 
 ## License
