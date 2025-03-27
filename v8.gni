@@ -6,5 +6,5 @@ is_prebuild = "v8"
 # Expose V8 symbols to allow depending on them externally.
 v8_expose_symbols = true
 
-# Disable pointer compression which in turn also disables the memory sandbox.
-v8_enable_pointer_compression = false
+# Disable the memory sandbox.
+v8_enable_sandbox = false
