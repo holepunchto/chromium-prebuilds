@@ -1,7 +1,7 @@
 gclient_gn_args_from = "src"
 
 vars = {
-  "chromium_version": "134.0.6998.39",
+  "chromium_version": "136.0.7103.48",
   "chromium_git": "https://chromium.googlesource.com",
 }
 
