@@ -1,8 +1,5 @@
 import("//prebuilds/platform/android.gni")
 import("//prebuilds/arch/x64.gni")
 
-# Don't bundle 32-bit assets with 64-bit builds.
-skip_secondary_abi_for_cq = true
-
 # Disable linting as it requires bundling 32-bit assets.
 disable_android_lint = true
