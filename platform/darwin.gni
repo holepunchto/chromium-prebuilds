@@ -1,3 +1,3 @@
 target_os = "mac"
 
-mac_deployment_target = "10.15"
+mac_deployment_target = "11.0"
