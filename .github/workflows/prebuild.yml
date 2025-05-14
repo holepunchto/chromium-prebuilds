@@ -50,10 +50,11 @@ jobs:
           ninja -C out/linux-x64/v8 prebuilds
 
       - name: Upload
+        working-directory: chromium/src
         uses: actions/upload-artifact@v4
         with:
           name: linux
-          path: out/**/v8/obj/prebuilds/*.a
+          path: out/*/v8/obj/prebuilds/*.a
           retention-days: 5
 
       - name: Clean
