@@ -9,7 +9,7 @@ jobs:
       - name: Install
         run: |
           sudo apt update
-          sudo apt install -y pkg-config
+          sudo apt install -y pkg-config bzip2
 
           if [ ! -d "depot_tools" ]; then
             git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
