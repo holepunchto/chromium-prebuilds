@@ -6,51 +6,59 @@ jobs:
     runs-on: beefcake-linux-x64
     name: linux
     steps:
-      - run: |
+      - name: Setup
+        run: |
           sudo apt update
           sudo apt install -y pkg-config
-      - run: |
+
           if [ ! -d "depot_tools" ]; then
             git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           fi
+
           echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
           mkdir -p chromium
-      - run: |
-          gclient config --name src/prebuilds --unmanaged https://github.com/${{ github.repository }}.git
+
+      - name: Download
         working-directory: chromium
-      - run: |
+        run: |
+          gclient config --name src/prebuilds --unmanaged https://github.com/${{ github.repository }}.git
           gclient sync -D
+
+          ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
+          ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
+
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
           fi
+
+      - name: Patch
         working-directory: chromium
-      - run: |
+        run: |
           git apply --directory src src/prebuilds/patches/*.patch
           git apply --directory src/v8 src/prebuilds/patches/v8/*.patch
-        working-directory: chromium
-      - run: |
-          ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
-          ./build/linux/sysroot_scripts/install-sysroot.py --arch=x64
+
+      - name: Build linux-arm64
         working-directory: chromium/src
-      - run: |
+        run: |
           gn gen out/linux-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-arm64.gni\")"
-        working-directory: chromium/src
-      - run: |
-          gn gen out/linux-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-x64.gni\")"
-        working-directory: chromium/src
-      - run: |
           ninja -C out/linux-arm64/v8 prebuilds
+
+      - name: Build linux-x64
         working-directory: chromium/src
-      - run: |
+        run: |
+          gn gen out/linux-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-x64.gni\")"
           ninja -C out/linux-x64/v8 prebuilds
-        working-directory: chromium/src
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
         with:
           name: linux
           path: out/*/v8/obj/prebuilds/*.a
           retention-days: 5
-      - run: |
+
+      - name: Clean
+        if: ${{ ! cancelled() }}
+        working-directory: chromium
+        run: |
           git apply --reverse --directory src src/prebuilds/patches/*.patch
           git apply --reverse --directory src/v8 src/prebuilds/patches/v8/*.patch
-        working-directory: chromium
-        if: ${{ ! cancelled() }}
