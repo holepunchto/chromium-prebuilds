@@ -1,0 +1,29 @@
+name: Prebuild
+on:
+  workflow_dispatch:
+jobs:
+  linux:
+    runs-on: beefcake-linux-x64
+    name: linux
+    steps:
+      - run: |
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
+          mkdir chromium
+      - run: |
+          gclient config --name src/prebuilds --unmanaged https://github.com/${{ github.repository }}.git
+        working-directory: chromium
+      - run: |
+          gclient sync
+          ln -s src/buildtools buildtools
+        working-directory: chromium
+      - run: |
+          git apply --directory src src/prebuilds/patches/*.patch
+          git apply --directory src/v8 src/prebuilds/patches/v8/*.patch
+        working-directory: chromium
+      - run: |
+          gn gen out/linux-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-arm64.gni\")"
+        working-directory: chromium/src
+      - run: |
+          ninja -C out/linux-arm64/v8 prebuilds
+        working-directory: chromium/src
