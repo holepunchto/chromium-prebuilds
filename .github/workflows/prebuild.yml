@@ -6,7 +6,7 @@ jobs:
     runs-on: beefcake-linux-x64
     name: linux
     steps:
-      - name: Setup
+      - name: Install
         run: |
           sudo apt update
           sudo apt install -y pkg-config
@@ -22,7 +22,7 @@ jobs:
         working-directory: chromium
         run: |
           gclient config --name src/prebuilds --unmanaged https://github.com/${{ github.repository }}.git
-          gclient sync -D --force
+          gclient sync -D
 
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
