@@ -8,3 +8,7 @@ v8_expose_symbols = true
 
 # Disable the memory sandbox.
 v8_enable_sandbox = false
+
+# Disable pointer compression.
+# https://issues.chromium.org/issues/42212828
+v8_enable_pointer_compression = false
