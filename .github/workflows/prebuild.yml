@@ -16,7 +16,7 @@ jobs:
           gclient config --name src/prebuilds --unmanaged https://github.com/${{ github.repository }}.git
         working-directory: chromium
       - run: |
-          gclient sync -D
+          gclient sync -D --force --reset
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
           fi
