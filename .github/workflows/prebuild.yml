@@ -57,7 +57,7 @@ jobs:
           retention-days: 5
 
       - name: Clean
-        if: ${{ ! cancelled() }}
+        if: always()
         working-directory: chromium
         run: |
           git apply --reverse --directory src src/prebuilds/patches/*.patch
