@@ -49,6 +49,30 @@ jobs:
           gn gen out/linux-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-x64.gni\")"
           ninja -C out/linux-x64/v8 prebuilds
 
+      - name: Build android-arm
+        working-directory: chromium/src
+        run: |
+          gn gen out/android-arm/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm.gni\")"
+          ninja -C out/android-arm/v8 prebuilds
+
+      - name: Build android-arm64
+        working-directory: chromium/src
+        run: |
+          gn gen out/android-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm64.gni\")"
+          ninja -C out/android-arm64/v8 prebuilds
+
+      - name: Build android-ia32
+        working-directory: chromium/src
+        run: |
+          gn gen out/android-ia32/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-ia32.gni\")"
+          ninja -C out/android-ia32/v8 prebuilds
+
+      - name: Build android-x64
+        working-directory: chromium/src
+        run: |
+          gn gen out/android-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-x64.gni\")"
+          ninja -C out/android-x64/v8 prebuilds
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
