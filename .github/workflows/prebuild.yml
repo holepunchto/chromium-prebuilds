@@ -22,7 +22,7 @@ jobs:
         working-directory: chromium
         run: |
           gclient config --name src/prebuilds --unmanaged https://github.com/${{ github.repository }}.git
-          gclient sync -D
+          gclient sync -D --force
 
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
