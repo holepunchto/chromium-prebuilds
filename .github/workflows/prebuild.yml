@@ -23,12 +23,14 @@ jobs:
         run: |
           cat <<EOF > .gclient
           solutions = [
-            { "name"        : "src/prebuilds",
-              "url"         : "git@github.com:${{ github.repository }}.git",
-              "deps_file"   : "DEPS",
-              "managed"     : False,
-              "custom_deps" : {},
-              "custom_vars" : {},
+            { "name": "src/prebuilds",
+              "url": "git@github.com:${{ github.repository }}.git",
+              "deps_file": "DEPS",
+              "managed": False,
+              "custom_deps": {},
+              "custom_vars": {
+                "checkout_pgo_profiles": True
+              },
             },
           ]
           target_os = ["linux", "android"]
