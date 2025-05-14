@@ -21,12 +21,14 @@ jobs:
       - name: Download
         working-directory: chromium
         run: |
-          cat > .gclient <<EOF
+          cat <<EOF > .gclient
           solutions = [
-            { "name"      : "src/prebuilds",
-              "url"       : "git@github.com:${{ github.repository }}.git",
-              "deps_file" : "DEPS",
-              "managed"   : False,
+            { "name"        : "src/prebuilds",
+              "url"         : "git@github.com:${{ github.repository }}.git",
+              "deps_file"   : "DEPS",
+              "managed"     : False,
+              "custom_deps" : {},
+              "custom_vars" : {},
             },
           ]
           target_os = ["linux", "android"]
