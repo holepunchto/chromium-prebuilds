@@ -7,15 +7,19 @@ jobs:
     name: linux
     steps:
       - run: |
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-          echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
-          mkdir chromium
+          if [ ! -d "depot_tools" ]; then
+            git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+            echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
+          fi
+          mkdir -p chromium
       - run: |
           gclient config --name src/prebuilds --unmanaged https://github.com/${{ github.repository }}.git
         working-directory: chromium
       - run: |
-          gclient sync
-          ln -s src/buildtools buildtools
+          gclient sync -D
+          if [ ! -d "buildtools" ]; then
+            ln -s src/buildtools buildtools
+          fi
         working-directory: chromium
       - run: |
           ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
