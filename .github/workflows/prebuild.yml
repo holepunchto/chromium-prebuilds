@@ -21,7 +21,18 @@ jobs:
       - name: Download
         working-directory: chromium
         run: |
-          gclient config --name src/prebuilds --unmanaged https://github.com/${{ github.repository }}.git
+          cat > .gclient <<EOF
+          solutions = [
+            { "name"      : "src/prebuilds",
+              "url"       : "git@github.com:${{ github.repository }}.git",
+              "deps_file" : "DEPS",
+              "managed"   : False,
+            },
+          ]
+          target_os = ["linux", "android"]
+          target_cpu = ["x64", "x86", "arm64", "arm"]
+          EOF
+
           gclient sync -D
 
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
