@@ -18,6 +18,10 @@ jobs:
           ln -s src/buildtools buildtools
         working-directory: chromium
       - run: |
+          ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
+          ./build/linux/sysroot_scripts/install-sysroot.py --arch=x64
+        working-directory: chromium/src
+      - run: |
           git apply --directory src src/prebuilds/patches/*.patch
           git apply --directory src/v8 src/prebuilds/patches/v8/*.patch
         working-directory: chromium
