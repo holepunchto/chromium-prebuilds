@@ -7,6 +7,9 @@ jobs:
     name: linux
     steps:
       - run: |
+          sudo apt update
+          sudo apt install -y pkg-config
+      - run: |
           if [ ! -d "depot_tools" ]; then
             git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           fi
