@@ -1,3 +1,6 @@
 import("//prebuilds/platform/ios.gni")
 import("//prebuilds/arch/arm64.gni")
 import("//prebuilds/environment/device.gni")
+
+# Disable the heap cage on iOS due to virtual memory allocation issues.
+cppgc_enable_caged_heap = false
