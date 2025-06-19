@@ -50,7 +50,6 @@ jobs:
         working-directory: chromium
         run: |
           git apply --directory src src/prebuilds/patches/*.patch
-          git apply --directory src/v8 src/prebuilds/patches/v8/*.patch
 
       - name: Build linux-arm64
         working-directory: chromium/src
@@ -100,4 +99,3 @@ jobs:
         working-directory: chromium
         run: |
           git apply --reverse --directory src src/prebuilds/patches/*.patch
-          git apply --reverse --directory src/v8 src/prebuilds/patches/v8/*.patch
