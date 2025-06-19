@@ -4,7 +4,7 @@ import("//prebuilds/v8/common.gni")
 is_prebuild = "v8"
 
 # Expose V8 symbols to allow depending on them externally.
-v8_expose_symbols = true
+v8_expose_public_symbols = true
 
 # Disable the memory sandbox.
 v8_enable_sandbox = false
