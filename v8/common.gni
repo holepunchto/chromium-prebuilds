@@ -9,3 +9,15 @@ v8_enable_gdbjit = false
 # Disable i18n support, including the `Intl` APIs. This produces a significantly
 # smaller archive.
 v8_enable_i18n_support = false
+
+# Disable the `Temporal` API as it adds a dependency on a Rust library, which is
+# not currently supported for static builds.
+# https://gn.issues.chromium.org/issues/42440276
+v8_enable_temporal_support = false
+
+# Enable the monolithic V8 build.
+v8_monolithic = true
+
+# Enable shared library support for the monolithic V8 build to avoid issues with
+# thread-local storage.
+v8_monolithic_for_shared_library = true
