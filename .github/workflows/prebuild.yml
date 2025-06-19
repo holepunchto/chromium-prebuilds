@@ -37,7 +37,7 @@ jobs:
           target_cpu = ["x64", "x86", "arm64", "arm"]
           EOF
 
-          gclient sync -D
+          gclient sync -D --revision src/prebuilds@${{ github.ref }}
 
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
