@@ -1,1 +1,3 @@
 target_os = "android"
+
+android_ndk_api_level = 29
