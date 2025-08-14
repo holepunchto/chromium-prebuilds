@@ -19,10 +19,11 @@ gclient config --name src/prebuilds [--cache-dir <path>] --unmanaged git@github.
 The `--cache-dir` argument, if provided, should point to a path, such as `~/.git_cache/`, that will be used for caching all cloned git repositories. When finished, fetch the repository and its dependencies:
 
 ```sh
-gclient sync
+gclient sync [--no-history]
 ```
 
-This will take a while depending on the speed of your connection. When completed, create a link to the fetched build tools to mark the root of the build tree:
+
+This will take a while depending on the speed of your connection, the `--no-history` option minimizes the wait time. When completed, create a link to the fetched build tools to mark the root of the build tree:
 
 ```sh
 # POSIX
