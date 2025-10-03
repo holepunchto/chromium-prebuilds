@@ -6,9 +6,8 @@ v8_use_external_startup_data = false
 # code. See https://v8.dev/docs/gdb-jit for more information.
 v8_enable_gdbjit = false
 
-# Disable i18n support, including the `Intl` APIs. This produces a significantly
-# smaller archive.
-v8_enable_i18n_support = false
+# Embed ICU data in the binary instead of depend on an external data file.
+v8_depend_on_icu_data_file = false
 
 # Disable the `Temporal` API as it adds a dependency on a Rust library, which is
 # not currently supported for static builds.
