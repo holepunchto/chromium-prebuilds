@@ -2,15 +2,110 @@ name: Prebuild
 on:
   workflow_dispatch:
 jobs:
-  linux:
-    runs-on: beefcake-linux-x64
-    name: linux
+  # linux:
+  #   runs-on: beefcake-linux-x64
+  #   name: linux
+  #   steps:
+  #     - name: Install
+  #       run: |
+  #         sudo apt update
+  #         sudo apt install -y pkg-config bzip2 gcc-multilib
+
+  #         if [ ! -d "depot_tools" ]; then
+  #           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+  #         fi
+
+  #         echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
+  #         mkdir -p chromium
+
+  #     - name: Download
+  #       working-directory: chromium
+  #       run: |
+  #         cat <<EOF > .gclient
+  #         solutions = [
+  #           { "name": "src/prebuilds",
+  #             "url": "git@github.com:${{ github.repository }}.git",
+  #             "deps_file": "DEPS",
+  #             "managed": False,
+  #             "custom_deps": {},
+  #             "custom_vars": {
+  #               "checkout_pgo_profiles": True
+  #             },
+  #           },
+  #         ]
+  #         target_os = ["linux", "android"]
+  #         target_cpu = ["x64", "x86", "arm64", "arm"]
+  #         EOF
+
+  #         gclient sync -D
+
+  #         ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
+  #         ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
+
+  #         if [ ! -d "buildtools" ]; then
+  #           ln -s src/buildtools buildtools
+  #         fi
+
+  #     - name: Patch
+  #       working-directory: chromium
+  #       run: |
+  #         git apply --directory src src/prebuilds/patches/*.patch
+
+  #     - name: Build linux-arm64
+  #       working-directory: chromium/src
+  #       run: |
+  #         gn gen out/linux-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-arm64.gni\")"
+  #         ninja -C out/linux-arm64/v8 prebuilds
+
+  #     - name: Build linux-x64
+  #       working-directory: chromium/src
+  #       run: |
+  #         gn gen out/linux-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-x64.gni\")"
+  #         ninja -C out/linux-x64/v8 prebuilds
+
+  #     - name: Build android-arm
+  #       working-directory: chromium/src
+  #       run: |
+  #         gn gen out/android-arm/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm.gni\")"
+  #         ninja -C out/android-arm/v8 prebuilds
+
+  #     - name: Build android-arm64
+  #       working-directory: chromium/src
+  #       run: |
+  #         gn gen out/android-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm64.gni\")"
+  #         ninja -C out/android-arm64/v8 prebuilds
+
+  #     - name: Build android-ia32
+  #       working-directory: chromium/src
+  #       run: |
+  #         gn gen out/android-ia32/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-ia32.gni\")"
+  #         ninja -C out/android-ia32/v8 prebuilds
+
+  #     - name: Build android-x64
+  #       working-directory: chromium/src
+  #       run: |
+  #         gn gen out/android-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-x64.gni\")"
+  #         ninja -C out/android-x64/v8 prebuilds
+
+  #     - name: Upload
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: linux
+  #         path: chromium/src/out/*/v8/obj/prebuilds/*.a
+  #         retention-days: 5
+
+  #     - name: Clean
+  #       if: always()
+  #       working-directory: chromium
+  #       run: |
+  #         git apply --reverse --directory src src/prebuilds/patches/*.patch
+
+  apple:
+    runs-on: beefcake-macos-arm64
+    name: apple
     steps:
       - name: Install
         run: |
-          sudo apt update
-          sudo apt install -y pkg-config bzip2 gcc-multilib
-
           if [ ! -d "depot_tools" ]; then
             git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           fi
@@ -33,14 +128,11 @@ jobs:
               },
             },
           ]
-          target_os = ["linux", "android"]
-          target_cpu = ["x64", "x86", "arm64", "arm"]
+          target_os = ["macos", "ios"]
+          target_cpu = ["x64", "arm64"]
           EOF
 
           gclient sync -D
-
-          ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
-          ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
 
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
@@ -50,48 +142,23 @@ jobs:
         working-directory: chromium
         run: |
           git apply --directory src src/prebuilds/patches/*.patch
-          git apply --directory src/v8 src/prebuilds/patches/v8/*.patch
 
-      - name: Build linux-arm64
+      - name: Build darwin-arm64
         working-directory: chromium/src
         run: |
-          gn gen out/linux-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-arm64.gni\")"
-          ninja -C out/linux-arm64/v8 prebuilds
+          gn gen out/darwin-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/darwin-arm64.gni\")"
+          ninja -C out/darwin-arm64/v8 prebuilds
 
-      - name: Build linux-x64
+      - name: Build darwin-x64
         working-directory: chromium/src
         run: |
-          gn gen out/linux-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-x64.gni\")"
-          ninja -C out/linux-x64/v8 prebuilds
-
-      - name: Build android-arm
-        working-directory: chromium/src
-        run: |
-          gn gen out/android-arm/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm.gni\")"
-          ninja -C out/android-arm/v8 prebuilds
-
-      - name: Build android-arm64
-        working-directory: chromium/src
-        run: |
-          gn gen out/android-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm64.gni\")"
-          ninja -C out/android-arm64/v8 prebuilds
-
-      - name: Build android-ia32
-        working-directory: chromium/src
-        run: |
-          gn gen out/android-ia32/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-ia32.gni\")"
-          ninja -C out/android-ia32/v8 prebuilds
-
-      - name: Build android-x64
-        working-directory: chromium/src
-        run: |
-          gn gen out/android-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-x64.gni\")"
-          ninja -C out/android-x64/v8 prebuilds
+          gn gen out/darwin-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/darwin-x64.gni\")"
+          ninja -C out/darwin-x64/v8 prebuilds
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: linux
+          name: apple
           path: chromium/src/out/*/v8/obj/prebuilds/*.a
           retention-days: 5
 
@@ -100,4 +167,3 @@ jobs:
         working-directory: chromium
         run: |
           git apply --reverse --directory src src/prebuilds/patches/*.patch
-          git apply --reverse --directory src/v8 src/prebuilds/patches/v8/*.patch
