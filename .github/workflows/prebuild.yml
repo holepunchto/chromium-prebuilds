@@ -132,7 +132,7 @@ jobs:
           target_cpu = ["x64", "arm64"]
           EOF
 
-          gclient sync -D -j16 -vv
+          gclient sync -D -j1 -vv
 
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
