@@ -1,14 +1,11 @@
-Allow the `libc++` prebuild target to declare a dependency on the bundled
-`libc++`.
-
 diff --git a/buildtools/third_party/libc++/BUILD.gn b/buildtools/third_party/libc++/BUILD.gn
-index 30fad21ed77fc..d7d9e3cebbdbc 100644
+index bce370633601c..2c6c448247828 100644
 --- a/buildtools/third_party/libc++/BUILD.gn
 +++ b/buildtools/third_party/libc++/BUILD.gn
-@@ -54,6 +54,7 @@ target(_libcxx_target_type, "libc++") {
+@@ -821,6 +821,7 @@ target(libcxx_target_type, "libc++") {
    visibility = [
      "//build/config:common_deps",
-     "//third_party/catapult/devil:devil",
+     "//third_party/catapult/devil",
 +    "//prebuilds:c++",
    ]
    if (is_linux) {
