@@ -99,3 +99,89 @@ jobs:
         working-directory: chromium
         run: |
           git apply --reverse --directory src src/prebuilds/patches/*.patch
+
+  apple:
+    runs-on: beefcake-macos-arm64
+    name: apple
+    steps:
+      - name: Install
+        run: |
+          if [ ! -d "depot_tools" ]; then
+            git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          fi
+
+          echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
+          mkdir -p chromium
+
+      - name: Download
+        working-directory: chromium
+        run: |
+          cat <<EOF > .gclient
+          solutions = [
+            { "name": "src/prebuilds",
+              "url": "https://github.com/${{ github.repository }}.git",
+              "deps_file": "DEPS",
+              "managed": False,
+              "custom_deps": {},
+              "custom_vars": {
+                "checkout_pgo_profiles": True
+              },
+            },
+          ]
+          target_os = ["macos", "ios"]
+          target_cpu = ["x64", "arm64"]
+          EOF
+
+          gclient sync -D --revision src/prebuilds@${{ github.ref }}
+
+          if [ ! -d "buildtools" ]; then
+            ln -s src/buildtools buildtools
+          fi
+
+      - name: Patch
+        working-directory: chromium
+        run: |
+          git apply --directory src src/prebuilds/patches/*.patch
+
+      - name: Build darwin-arm64
+        working-directory: chromium/src
+        run: |
+          gn gen out/darwin-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/darwin-arm64.gni\")"
+          ninja -C out/darwin-arm64/v8 prebuilds
+
+      - name: Build darwin-x64
+        working-directory: chromium/src
+        run: |
+          gn gen out/darwin-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/darwin-x64.gni\")"
+          ninja -C out/darwin-x64/v8 prebuilds
+
+      - name: Build ios-arm64
+        working-directory: chromium/src
+        run: |
+          gn gen out/ios-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-arm64.gni\") v8_enable_webassembly = false cppgc_enable_caged_heap = false"
+          ninja -C out/ios-arm64/v8 prebuilds
+
+      - name: Build ios-arm64-simulator
+        working-directory: chromium/src
+        run: |
+          gn gen out/ios-arm64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-arm64-simulator.gni\") v8_enable_webassembly = false"
+          ninja -C out/ios-arm64-simulator/v8 prebuilds
+
+      - name: Build ios-x64-simulator
+        working-directory: chromium/src
+        run: |
+          gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-x64-simulator.gni\") v8_enable_webassembly = false"
+          ninja -C out/ios-x64-simulator/v8 prebuilds
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: apple
+          path: chromium/src/out/*/v8/obj/prebuilds/*.a
+          retention-days: 5
+
+      - name: Clean
+        if: always()
+        working-directory: chromium
+        run: |
+          git apply --reverse --directory src src/prebuilds/patches/*.patch
