@@ -156,6 +156,24 @@ jobs:
           gn gen out/darwin-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/darwin-x64.gni\")"
           ninja -C out/darwin-x64/v8 prebuilds
 
+      - name: Build ios-arm64
+        working-directory: chromium/src
+        run: |
+          gn gen out/ios-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-arm64.gni\") v8_enable_webassembly = false cppgc_enable_caged_heap = false"
+          ninja -C out/ios-arm64/v8 prebuilds
+
+      - name: Build ios-arm64-simulator
+        working-directory: chromium/src
+        run: |
+          gn gen out/ios-arm64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-arm64-simulator.gni\") v8_enable_webassembly = false"
+          ninja -C out/ios-arm64-simulator/v8 prebuilds
+
+      - name: Build ios-x64-simulator
+        working-directory: chromium/src
+        run: |
+          gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-x64-simulator.gni\") v8_enable_webassembly = false"
+          ninja -C out/ios-x64-simulator/v8 prebuilds
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
