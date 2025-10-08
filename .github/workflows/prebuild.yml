@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
 jobs:
   linux:
-    if: false
     runs-on: beefcake-linux-x64
     name: linux
     steps:
