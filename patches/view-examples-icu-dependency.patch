@@ -1,8 +1,16 @@
 diff --git a/ui/views/examples/BUILD.gn b/ui/views/examples/BUILD.gn
-index 500dd0d66f6c7..34697ed474a5e 100644
+index 500dd0d66f6c7..fcd5e836ba295 100644
 --- a/ui/views/examples/BUILD.gn
 +++ b/ui/views/examples/BUILD.gn
-@@ -366,7 +366,6 @@ if (is_mac) {
+@@ -5,6 +5,7 @@
+ import("//build/config/ui.gni")
+ import("//testing/test.gni")
+ import("//tools/grit/grit_rule.gni")
++import("//third_party/icu/config.gni")
+ 
+ if (is_mac) {
+   import("//build/apple/tweak_info_plist.gni")
+@@ -366,7 +367,6 @@ if (is_mac) {
      testonly = true
  
      sources = [
@@ -10,7 +18,7 @@ index 500dd0d66f6c7..34697ed474a5e 100644
        "$root_out_dir/ui_test.pak",
        "$root_out_dir/views_examples_resources.pak",
      ]
-@@ -374,7 +373,10 @@ if (is_mac) {
+@@ -374,7 +374,10 @@ if (is_mac) {
        ":views_examples_resources_pak",
        "//ui/resources:ui_test_pak",
      ]
