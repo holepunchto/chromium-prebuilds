@@ -1,0 +1,24 @@
+diff --git a/ui/views/examples/BUILD.gn b/ui/views/examples/BUILD.gn
+index 500dd0d66f6c7..34697ed474a5e 100644
+--- a/ui/views/examples/BUILD.gn
++++ b/ui/views/examples/BUILD.gn
+@@ -366,7 +366,6 @@ if (is_mac) {
+     testonly = true
+ 
+     sources = [
+-      "$root_out_dir/icudtl.dat",
+       "$root_out_dir/ui_test.pak",
+       "$root_out_dir/views_examples_resources.pak",
+     ]
+@@ -374,7 +373,10 @@ if (is_mac) {
+       ":views_examples_resources_pak",
+       "//ui/resources:ui_test_pak",
+     ]
+-    deps = [ "//third_party/icu:icudata" ]
++    if (icu_use_data_file) {
++      sources += [ "$root_out_dir/icudtl.dat" ]
++      deps += [ "//third_party/icu:icudata" ]
++    }
+ 
+     outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
+   }

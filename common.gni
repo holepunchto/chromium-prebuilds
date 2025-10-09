@@ -9,3 +9,7 @@ dcheck_always_on = false
 # Don't perform a component build as we're interested in bundling everything
 # into single archives.
 is_component_build = false
+
+# Don't use a separate data file for ICU, but embed it statically instead.
+# This increases executable size, but simplifies distribution.
+icu_use_data_file = false
