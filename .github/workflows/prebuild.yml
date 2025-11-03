@@ -220,7 +220,7 @@ jobs:
           target_cpu = ["x64", "arm64"]
           '@ | Out-File -FilePath ".gclient" -Encoding utf8
 
-          gclient sync -D --force --revision "src/prebuilds@${{ github.ref }}"
+          gclient sync -D --reset --revision "src/prebuilds@${{ github.ref }}"
 
           if (-not (Test-Path "buildtools" -PathType Container)) {
               New-Item -ItemType SymbolicLink -Path "buildtools" -Target "src/buildtools" | Out-Null
@@ -229,7 +229,9 @@ jobs:
       - name: Patch
         working-directory: chromium
         run: |
-          git apply --directory src src/prebuilds/patches/*.patch
+          Get-ChildItem "src/prebuilds/patches" -Filter "*.patch" | ForEach-Object {
+            git apply --directory src $_.FullName
+          }
 
       - name: Build win32-arm64
         working-directory: chromium/src
@@ -254,4 +256,6 @@ jobs:
         if: always()
         working-directory: chromium
         run: |
-          git apply --reverse --directory src src/prebuilds/patches/*.patch
+          Get-ChildItem "src/prebuilds/patches" -Filter "*.patch" | ForEach-Object {
+            git apply --reverse --directory src $_.FullName
+          }
