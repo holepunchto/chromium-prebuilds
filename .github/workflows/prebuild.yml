@@ -133,7 +133,7 @@ jobs:
           target_cpu = ["x64", "arm64"]
           EOF
 
-          gclient sync -D --revision src/prebuilds@${{ github.ref }}
+          gclient sync -D --force --revision src/prebuilds@${{ github.ref }}
 
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
