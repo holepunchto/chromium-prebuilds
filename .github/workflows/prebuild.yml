@@ -36,7 +36,7 @@ jobs:
           target_cpu = ["x64", "x86", "arm64", "arm"]
           EOF
 
-          gclient sync -D --revision src/prebuilds@${{ github.ref }}
+          gclient sync -D --reset --revision src/prebuilds@${{ github.ref }}
 
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
@@ -93,12 +93,6 @@ jobs:
           path: chromium/src/out/*/v8/obj/prebuilds/*.a
           retention-days: 5
 
-      - name: Clean
-        if: always()
-        working-directory: chromium
-        run: |
-          git apply --reverse --directory src src/prebuilds/patches/*.patch
-
   apple:
     if: false
     runs-on: beefcake-macos-arm64
@@ -133,7 +127,7 @@ jobs:
           target_cpu = ["x64", "arm64"]
           EOF
 
-          gclient sync -D --revision src/prebuilds@${{ github.ref }}
+          gclient sync -D --reset --revision src/prebuilds@${{ github.ref }}
 
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
@@ -181,12 +175,6 @@ jobs:
           path: chromium/src/out/*/v8/obj/prebuilds/*.a
           retention-days: 5
 
-      - name: Clean
-        if: always()
-        working-directory: chromium
-        run: |
-          git apply --reverse --directory src src/prebuilds/patches/*.patch
-
   windows:
     runs-on: beefcake-win32-x64
     name: windows
@@ -225,7 +213,7 @@ jobs:
           gclient sync -D --reset --revision "src/prebuilds@${{ github.ref }}"
 
           if (-not (Test-Path "buildtools" -PathType Container)) {
-              New-Item -ItemType SymbolicLink -Path "buildtools" -Target "src/buildtools" | Out-Null
+              New-Item -ItemType Junction -Path "buildtools" -Target "src/buildtools" | Out-Null
           }
 
       - name: Patch
@@ -253,11 +241,3 @@ jobs:
           name: apple
           path: chromium/src/out/*/v8/obj/prebuilds/*.a
           retention-days: 5
-
-      - name: Clean
-        if: always()
-        working-directory: chromium
-        run: |
-          Get-ChildItem "src/prebuilds/patches" -Filter "*.patch" | ForEach-Object {
-            git apply --reverse --directory src $_.FullName
-          }
