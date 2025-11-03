@@ -203,6 +203,8 @@ jobs:
 
       - name: Download
         working-directory: chromium
+        env:
+          DEPOT_TOOLS_WIN_TOOLCHAIN: 0
         run: |
           @'
           solutions = [
