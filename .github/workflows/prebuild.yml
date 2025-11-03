@@ -97,7 +97,7 @@ jobs:
         if: always()
         working-directory: chromium
         run: |
-          git apply --reverse --directory src src/prebuilds/patches/*.patch
+          git checkout .
 
   apple:
     if: false
@@ -185,7 +185,7 @@ jobs:
         if: always()
         working-directory: chromium
         run: |
-          git apply --reverse --directory src src/prebuilds/patches/*.patch
+          git checkout .
 
   windows:
     runs-on: beefcake-win32-x64
@@ -222,7 +222,7 @@ jobs:
           target_cpu = ["x64", "arm64"]
           '@ | Out-File -FilePath ".gclient" -Encoding utf8
 
-          gclient sync -D --force --revision "src/prebuilds@${{ github.ref }}"
+          gclient sync -D --revision "src/prebuilds@${{ github.ref }}"
 
           if (-not (Test-Path "buildtools" -PathType Container)) {
               New-Item -ItemType Junction -Path "buildtools" -Target "src/buildtools" | Out-Null
@@ -258,6 +258,4 @@ jobs:
         if: always()
         working-directory: chromium
         run: |
-          Get-ChildItem "src/prebuilds/patches" -Filter "*.patch" | ForEach-Object {
-            git apply --reverse --directory src $_.FullName
-          }
+          git checkout .
