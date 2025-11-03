@@ -193,8 +193,6 @@ jobs:
     steps:
       - name: Install
         run: |
-          git config --system core.longpaths true
-
           if (-not (Test-Path "depot_tools" -PathType Container)) {
               git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           }
