@@ -242,3 +242,16 @@ jobs:
         run: |
           gn gen out/win32-x64/v8 --args="import(\`"//prebuilds/v8.gni\`") import(\`"//prebuilds/mode/release.gni\`") import(\`"//prebuilds/target/win32-x64.gni\`")"
           ninja -C out/win32-x64/v8 prebuilds
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: apple
+          path: chromium/src/out/*/v8/obj/prebuilds/*.a
+          retention-days: 5
+
+      - name: Clean
+        if: always()
+        working-directory: chromium
+        run: |
+          git apply --reverse --directory src src/prebuilds/patches/*.patch
