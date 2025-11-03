@@ -95,7 +95,7 @@ jobs:
 
       - name: Clean
         if: always()
-        working-directory: chromium
+        working-directory: chromium/src
         run: |
           git checkout .
 
@@ -183,7 +183,7 @@ jobs:
 
       - name: Clean
         if: always()
-        working-directory: chromium
+        working-directory: chromium/src
         run: |
           git checkout .
 
@@ -256,6 +256,6 @@ jobs:
 
       - name: Clean
         if: always()
-        working-directory: chromium
+        working-directory: chromium/src
         run: |
           git checkout .
