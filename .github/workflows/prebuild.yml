@@ -222,7 +222,7 @@ jobs:
           target_cpu = ["x64", "arm64"]
           '@ | Out-File -FilePath ".gclient" -Encoding utf8
 
-          gclient sync -D --revision "src/prebuilds@${{ github.ref }}"
+          gclient sync -D --force --revision "src/prebuilds@${{ github.ref }}"
 
           if (-not (Test-Path "buildtools" -PathType Container)) {
               New-Item -ItemType Junction -Path "buildtools" -Target "src/buildtools" | Out-Null
