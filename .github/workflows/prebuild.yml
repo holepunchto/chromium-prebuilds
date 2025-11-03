@@ -190,6 +190,8 @@ jobs:
   windows:
     runs-on: beefcake-win32-x64
     name: windows
+    env:
+      DEPOT_TOOLS_WIN_TOOLCHAIN: 0
     steps:
       - name: Install
         run: |
@@ -203,8 +205,6 @@ jobs:
 
       - name: Download
         working-directory: chromium
-        env:
-          DEPOT_TOOLS_WIN_TOOLCHAIN: 0
         run: |
           @'
           solutions = [
