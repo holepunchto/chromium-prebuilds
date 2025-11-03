@@ -218,7 +218,7 @@ jobs:
               },
             },
           ]
-          target_os = ["macos", "ios"]
+          target_os = ["win"]
           target_cpu = ["x64", "arm64"]
           '@ | Out-File -FilePath ".gclient" -Encoding utf8
 
