@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
 jobs:
   linux:
-    if: false
     runs-on: beefcake-linux-x64
     name: linux
     steps:
@@ -100,7 +99,6 @@ jobs:
           git checkout .
 
   apple:
-    if: false
     runs-on: beefcake-macos-arm64
     name: apple
     steps:
