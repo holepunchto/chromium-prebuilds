@@ -8,14 +8,12 @@ jobs:
     steps:
       - name: Install
         run: |
-          sudo apt update
-          sudo apt install -y pkg-config bzip2 gcc-multilib
-
           if [ ! -d "depot_tools" ]; then
             git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           fi
 
           echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
+
           mkdir -p chromium
 
       - name: Download
@@ -96,9 +94,9 @@ jobs:
 
       - name: Clean
         if: always()
-        working-directory: chromium
+        working-directory: chromium/src
         run: |
-          git apply --reverse --directory src src/prebuilds/patches/*.patch
+          git checkout .
 
   apple:
     runs-on: beefcake-macos-arm64
@@ -111,6 +109,7 @@ jobs:
           fi
 
           echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
+
           mkdir -p chromium
 
       - name: Download
@@ -182,6 +181,79 @@ jobs:
 
       - name: Clean
         if: always()
+        working-directory: chromium/src
+        run: |
+          git checkout .
+
+  windows:
+    runs-on: beefcake-win32-x64
+    name: windows
+    env:
+      DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+    steps:
+      - name: Install
+        run: |
+          if (-not (Test-Path "depot_tools" -PathType Container)) {
+              git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          }
+
+          "$env:GITHUB_WORKSPACE\depot_tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+          New-Item -ItemType Directory -Force -Path "chromium" | Out-Null
+
+      - name: Download
         working-directory: chromium
         run: |
-          git apply --reverse --directory src src/prebuilds/patches/*.patch
+          @'
+          solutions = [
+            { "name": "src/prebuilds",
+              "url": "https://github.com/${{ github.repository }}.git",
+              "deps_file": "DEPS",
+              "managed": False,
+              "custom_deps": {},
+              "custom_vars": {
+                "checkout_pgo_profiles": True
+              },
+            },
+          ]
+          target_os = ["win"]
+          target_cpu = ["x64", "arm64"]
+          '@ | Out-File -FilePath ".gclient" -Encoding utf8
+
+          gclient sync -D --revision "src/prebuilds@${{ github.ref }}"
+
+          if (-not (Test-Path "buildtools" -PathType Container)) {
+              New-Item -ItemType Junction -Path "buildtools" -Target "src/buildtools" | Out-Null
+          }
+
+      - name: Patch
+        working-directory: chromium
+        run: |
+          Get-ChildItem "src/prebuilds/patches" -Filter "*.patch" | ForEach-Object {
+            git apply --directory src $_.FullName
+          }
+
+      - name: Build win32-arm64
+        working-directory: chromium/src
+        run: |
+          gn gen out/win32-arm64/v8 --args="import(\`"//prebuilds/v8.gni\`") import(\`"//prebuilds/mode/release.gni\`") import(\`"//prebuilds/target/win32-arm64.gni\`")"
+          ninja -C out/win32-arm64/v8 prebuilds
+
+      - name: Build win32-x64
+        working-directory: chromium/src
+        run: |
+          gn gen out/win32-x64/v8 --args="import(\`"//prebuilds/v8.gni\`") import(\`"//prebuilds/mode/release.gni\`") import(\`"//prebuilds/target/win32-x64.gni\`")"
+          ninja -C out/win32-x64/v8 prebuilds
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: chromium/src/out/*/v8/obj/prebuilds/*.lib
+          retention-days: 5
+
+      - name: Clean
+        if: always()
+        working-directory: chromium/src
+        run: |
+          git checkout .
