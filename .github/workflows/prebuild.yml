@@ -251,7 +251,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: apple
-          path: chromium/src/out/*/v8/obj/prebuilds/*.a
+          path: chromium/src/out/*/v8/obj/prebuilds/*.lib
           retention-days: 5
 
       - name: Clean
