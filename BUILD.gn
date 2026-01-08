@@ -15,7 +15,10 @@ static_prebuild("c++") {
 
   deps = [ "//buildtools/third_party/libc++" ]
 
-  include_dirs = [ "//third_party/libc++/src/include" ]
+  include_dirs = [
+    "//third_party/libc++/src/include",
+    "//buildtools/third_party/libc++",
+  ]
 }
 
 if (is_prebuild == "v8") {
