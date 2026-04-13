@@ -10,6 +10,9 @@ dcheck_always_on = false
 # into single archives.
 is_component_build = false
 
+# Enable Blink components, which among other things enables JIT on iOS.
+use_blink = true
+
 # Don't use a separate data file for ICU, but embed it statically instead.
 # This increases executable size, but simplifies distribution.
 icu_use_data_file = false
