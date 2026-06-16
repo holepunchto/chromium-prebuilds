@@ -35,7 +35,7 @@ jobs:
           target_cpu = ["x64", "x86", "arm64", "arm"]
           EOF
 
-          gclient sync -D --force --reset --revision src/prebuilds@${{ github.ref }}
+          gclient sync -D --revision src/prebuilds@${{ github.ref }}
 
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
@@ -132,7 +132,7 @@ jobs:
           target_cpu = ["x64", "arm64"]
           EOF
 
-          gclient sync -D --force --reset --revision src/prebuilds@${{ github.ref }}
+          gclient sync -D --revision src/prebuilds@${{ github.ref }}
 
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
@@ -222,7 +222,7 @@ jobs:
           target_cpu = ["x64", "arm64"]
           '@ | Out-File -FilePath ".gclient" -Encoding utf8
 
-          gclient sync -D --force --reset --revision "src/prebuilds@${{ github.ref }}"
+          gclient sync -D --revision "src/prebuilds@${{ github.ref }}"
 
           if (-not (Test-Path "buildtools" -PathType Container)) {
               New-Item -ItemType Junction -Path "buildtools" -Target "src/buildtools" | Out-Null
