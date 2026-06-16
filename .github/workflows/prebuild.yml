@@ -35,7 +35,7 @@ jobs:
           target_cpu = ["x64", "x86", "arm64", "arm"]
           EOF
 
-          gclient sync -D --force --revision src/prebuilds@${{ github.ref }}
+          gclient sync -D --force --reset --revision src/prebuilds@${{ github.ref }}
 
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
@@ -96,7 +96,8 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git checkout .
+          git reset --hard HEAD
+          git clean -ffd
 
   apple:
     runs-on: beefcake-macos-arm64
