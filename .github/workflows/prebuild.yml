@@ -1,6 +1,10 @@
 name: Prebuild
 on:
   workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}
 jobs:
   linux:
     runs-on: beefcake-linux-x64
