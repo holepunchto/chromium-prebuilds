@@ -132,7 +132,7 @@ jobs:
           target_cpu = ["x64", "arm64"]
           EOF
 
-          gclient sync -D --revision src/prebuilds@${{ github.ref }}
+          gclient sync -D --force --reset --revision src/prebuilds@${{ github.ref }}
 
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
@@ -184,7 +184,8 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git checkout .
+          git reset --hard HEAD
+          git clean -ffd
 
   windows:
     runs-on: beefcake-win32-x64
@@ -221,7 +222,7 @@ jobs:
           target_cpu = ["x64", "arm64"]
           '@ | Out-File -FilePath ".gclient" -Encoding utf8
 
-          gclient sync -D --revision "src/prebuilds@${{ github.ref }}"
+          gclient sync -D --force --reset --revision "src/prebuilds@${{ github.ref }}"
 
           if (-not (Test-Path "buildtools" -PathType Container)) {
               New-Item -ItemType Junction -Path "buildtools" -Target "src/buildtools" | Out-Null
@@ -257,4 +258,5 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git checkout .
+          git reset --hard HEAD
+          git clean -ffd
