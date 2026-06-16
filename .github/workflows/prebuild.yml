@@ -1,6 +1,10 @@
 name: Prebuild
 on:
   workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}
 jobs:
   linux:
     runs-on: beefcake-linux-x64
@@ -96,7 +100,10 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git checkout .
+          git rebase --abort 2>/dev/null || true
+          git checkout --detach 2>/dev/null || true
+          git reset --hard HEAD
+          git clean -ffd
 
   apple:
     runs-on: beefcake-macos-arm64
@@ -183,7 +190,10 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git checkout .
+          git rebase --abort 2>/dev/null || true
+          git checkout --detach 2>/dev/null || true
+          git reset --hard HEAD
+          git clean -ffd
 
   windows:
     runs-on: beefcake-win32-x64
@@ -256,4 +266,7 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git checkout .
+          git rebase --abort 2>$null
+          git checkout --detach 2>$null
+          git reset --hard HEAD
+          git clean -ffd
