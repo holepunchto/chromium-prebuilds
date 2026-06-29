@@ -18,6 +18,8 @@ jobs:
 
           echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
 
+          echo "$GITHUB_WORKSPACE/depot_tools/python-bin" >> $GITHUB_PATH
+
           mkdir -p chromium
 
       - name: Download
@@ -117,6 +119,8 @@ jobs:
 
           echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
 
+          echo "$GITHUB_WORKSPACE/depot_tools/python-bin" >> $GITHUB_PATH
+
           mkdir -p chromium
 
       - name: Download
@@ -208,6 +212,8 @@ jobs:
           }
 
           "$env:GITHUB_WORKSPACE\depot_tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+          "$env:GITHUB_WORKSPACE\depot_tools\python-bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
           New-Item -ItemType Directory -Force -Path "chromium" | Out-Null
 
