@@ -58,6 +58,10 @@ cd src
 
 Next, generate a build system using `gn` for your desired target and module, replacing `<target>` with one of the supported targets as defined by [`target/`](target/) and `<module>` with one of `v8`, `content`, or `webrtc`:
 
+> [!NOTE]
+>
+> To build with a sanitizer, additionally import one of the definitions in [`sanitizer/`](sanitizer/). The prebuild must be instrumented with the same sanitizers as the program it is linked into, or the two will disagree on the annotations they apply to shared libc++ containers.
+
 ```sh
 # POSIX
 gn gen out/<target>/<module> --args="import(\"//prebuilds/<module>.gni\") import(\"//prebuilds/mode/<release|debug>.gni\") import(\"//prebuilds/target/<target>.gni\")"
@@ -82,6 +86,12 @@ gn gen out/<target>/<module> --args="import(\`"//prebuilds/<module>.gni\`") impo
 >
 > ```sh
 > gn gen out/win32-x64/v8 --args="import(\`"//prebuilds/v8.gni\`") import(\`"//prebuilds/mode/release.gni\`") import(\`"//prebuilds/target/win32-x64.gni\`")"
+> ```
+>
+> To make a debug build of V8 for macOS 64-bit ARM instrumented with AddressSanitizer, do:
+>
+> ```sh
+> gn gen out/darwin-arm64/v8-asan --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/debug.gni\") import(\"//prebuilds/target/darwin-arm64.gni\") import(\"//prebuilds/sanitizer/address.gni\")"
 > ```
 
 Finally, run the build system for the `prebuilds` target:
