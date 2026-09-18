@@ -41,6 +41,11 @@ jobs:
           target_cpu = ["x64", "x86", "arm64", "arm"]
           EOF
 
+          if [ -d src/.git ]; then
+            mkdir -p src/.git/info
+            grep -qxF "/prebuilds/" src/.git/info/exclude 2>/dev/null || echo "/prebuilds/" >> src/.git/info/exclude
+          fi
+
           gclient sync -D --force --revision src/prebuilds@${{ github.ref }}
 
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
@@ -142,6 +147,11 @@ jobs:
           target_cpu = ["x64", "arm64"]
           EOF
 
+          if [ -d src/.git ]; then
+            mkdir -p src/.git/info
+            grep -qxF "/prebuilds/" src/.git/info/exclude 2>/dev/null || echo "/prebuilds/" >> src/.git/info/exclude
+          fi
+
           gclient sync -D --force --revision src/prebuilds@${{ github.ref }}
 
           if [ ! -d "buildtools" ]; then
@@ -235,6 +245,16 @@ jobs:
           target_os = ["win"]
           target_cpu = ["x64", "arm64"]
           '@ | Out-File -FilePath ".gclient" -Encoding utf8
+
+          if (Test-Path "src/.git" -PathType Container) {
+              New-Item -ItemType Directory -Force -Path "src/.git/info" | Out-Null
+
+              $exclude = "src/.git/info/exclude"
+
+              if (-not ((Test-Path $exclude) -and (@(Get-Content $exclude) -contains "/prebuilds/"))) {
+                  Add-Content -Path $exclude -Value "/prebuilds/"
+              }
+          }
 
           gclient sync -D --force --revision "src/prebuilds@${{ github.ref }}"
 
