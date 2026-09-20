@@ -1,0 +1,9 @@
+# Instrument with AddressSanitizer (ASan).
+#
+# Instrumentation must match that of the consumer of the prebuild. libc++ emits
+# its container annotations per translation unit, but the helpers applying them
+# are weak symbols that are deduplicated across the program, so mixing an
+# instrumented consumer with an uninstrumented prebuild leaves containers
+# poisoned that are never unpoisoned again.
+# https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow
+is_asan = true
