@@ -113,7 +113,7 @@ jobs:
           git clean -ffd
 
   apple:
-    runs-on: beefcake-macos-arm64
+    runs-on: prebuilds-macos-arm64
     name: apple
     steps:
       - name: Install
