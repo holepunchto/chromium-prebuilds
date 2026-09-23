@@ -8,6 +8,8 @@ concurrency:
 jobs:
   linux:
     runs-on: beefcake-linux-x64
+    environment:
+      name: chromium
     name: linux
     steps:
       - name: Install
@@ -107,6 +109,8 @@ jobs:
 
   apple:
     runs-on: beefcake-macos-arm64
+    environment:
+      name: chromium
     name: apple
     steps:
       - name: Install
@@ -197,6 +201,8 @@ jobs:
 
   windows:
     runs-on: beefcake-win32-x64
+    environment:
+      name: chromium
     name: windows
     env:
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
