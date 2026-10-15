@@ -7,7 +7,7 @@ concurrency:
   group: ${{ github.workflow }}
 jobs:
   linux:
-    runs-on: beefcake-linux-x64
+    runs-on: prebuilds-linux-x64
     environment:
       name: chromium
     name: linux
@@ -214,7 +214,7 @@ jobs:
           git clean -ffd
 
   windows:
-    runs-on: beefcake-win32-x64
+    runs-on: prebuilds-win32-x64
     environment:
       name: chromium
     name: windows
