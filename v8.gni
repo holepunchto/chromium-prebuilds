@@ -28,6 +28,10 @@ v8_expose_public_symbols = true
 # Disable the memory sandbox.
 v8_enable_sandbox = false
 
-# Disable pointer compression.
-# https://issues.chromium.org/issues/42212828
-v8_enable_pointer_compression = false
+# Enable WebAssembly, including on platforms that default to lite mode, such as
+# iOS, where it is executed by the DrumBrake interpreter.
+v8_enable_webassembly = true
+
+# Enable the DrumBrake WebAssembly interpreter, which is required for running
+# WebAssembly in jitless mode. DrumBrake depends on pointer compression.
+v8_enable_drumbrake = true

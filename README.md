@@ -100,6 +100,21 @@ Finally, run the build system for the `prebuilds` target:
 ninja -C out/<target>/<module> prebuilds
 ```
 
+## Usage
+
+### V8
+
+V8 is built with pointer compression on all 64-bit targets and with the [DrumBrake](https://v8.dev/blog/wasm-interpreter) WebAssembly interpreter on all targets except Android, where DrumBrake is unavailable. DrumBrake allows WebAssembly to run with `--jitless`, which is required on iOS.
+
+> [!IMPORTANT]
+>
+> Pointer compression and the caged heap of the C++ garbage collector each reserve a large, process-wide region of virtual memory when V8 is initialized. On iOS, these reservations exceed the default address space limit of apps, causing a `Failed to reserve virtual memory for process-wide V8 pointer compression cage` fatal error on devices. Apps that link the iOS prebuilds must therefore be signed with the [`com.apple.developer.kernel.extended-virtual-addressing`](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.developer.kernel.extended-virtual-addressing) entitlement:
+>
+> ```xml
+> <key>com.apple.developer.kernel.extended-virtual-addressing</key>
+> <true/>
+> ```
+
 ## License
 
 Apache-2.0
