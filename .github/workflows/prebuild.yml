@@ -7,7 +7,7 @@ concurrency:
   group: ${{ github.workflow }}
 jobs:
   linux:
-    runs-on: beefcake-linux-x64
+    runs-on: prebuilds-linux-x64
     environment:
       name: chromium
     name: linux
@@ -19,6 +19,8 @@ jobs:
           fi
 
           echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
+
+          echo "$GITHUB_WORKSPACE/depot_tools/python-bin" >> $GITHUB_PATH
 
           mkdir -p chromium
 
@@ -41,7 +43,12 @@ jobs:
           target_cpu = ["x64", "x86", "arm64", "arm"]
           EOF
 
-          gclient sync -D --revision src/prebuilds@${{ github.ref }}
+          if [ -d src/.git ]; then
+            mkdir -p src/.git/info
+            grep -qxF "/prebuilds/" src/.git/info/exclude 2>/dev/null || echo "/prebuilds/" >> src/.git/info/exclude
+          fi
+
+          gclient sync -D --force --revision src/prebuilds@${{ github.ref }}
 
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
@@ -70,25 +77,25 @@ jobs:
       - name: Build android-arm
         working-directory: chromium/src
         run: |
-          gn gen out/android-arm/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm.gni\")"
+          gn gen out/android-arm/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm.gni\") v8_enable_drumbrake = false"
           ninja -C out/android-arm/v8 prebuilds
 
       - name: Build android-arm64
         working-directory: chromium/src
         run: |
-          gn gen out/android-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm64.gni\")"
+          gn gen out/android-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm64.gni\") v8_enable_drumbrake = false"
           ninja -C out/android-arm64/v8 prebuilds
 
       - name: Build android-ia32
         working-directory: chromium/src
         run: |
-          gn gen out/android-ia32/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-ia32.gni\")"
+          gn gen out/android-ia32/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-ia32.gni\") v8_enable_drumbrake = false"
           ninja -C out/android-ia32/v8 prebuilds
 
       - name: Build android-x64
         working-directory: chromium/src
         run: |
-          gn gen out/android-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-x64.gni\")"
+          gn gen out/android-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-x64.gni\") v8_enable_drumbrake = false"
           ninja -C out/android-x64/v8 prebuilds
 
       - name: Upload
@@ -108,7 +115,7 @@ jobs:
           git clean -ffd
 
   apple:
-    runs-on: beefcake-macos-arm64
+    runs-on: prebuilds-macos-arm64
     environment:
       name: chromium
     name: apple
@@ -120,6 +127,8 @@ jobs:
           fi
 
           echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
+
+          echo "$GITHUB_WORKSPACE/depot_tools/python-bin" >> $GITHUB_PATH
 
           mkdir -p chromium
 
@@ -142,7 +151,12 @@ jobs:
           target_cpu = ["x64", "arm64"]
           EOF
 
-          gclient sync -D --revision src/prebuilds@${{ github.ref }}
+          if [ -d src/.git ]; then
+            mkdir -p src/.git/info
+            grep -qxF "/prebuilds/" src/.git/info/exclude 2>/dev/null || echo "/prebuilds/" >> src/.git/info/exclude
+          fi
+
+          gclient sync -D --force --revision src/prebuilds@${{ github.ref }}
 
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
@@ -168,19 +182,19 @@ jobs:
       - name: Build ios-arm64
         working-directory: chromium/src
         run: |
-          gn gen out/ios-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-arm64.gni\") v8_enable_webassembly = false cppgc_enable_caged_heap = false"
+          gn gen out/ios-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-arm64.gni\")"
           ninja -C out/ios-arm64/v8 prebuilds
 
       - name: Build ios-arm64-simulator
         working-directory: chromium/src
         run: |
-          gn gen out/ios-arm64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-arm64-simulator.gni\") v8_enable_webassembly = false"
+          gn gen out/ios-arm64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-arm64-simulator.gni\")"
           ninja -C out/ios-arm64-simulator/v8 prebuilds
 
       - name: Build ios-x64-simulator
         working-directory: chromium/src
         run: |
-          gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-x64-simulator.gni\") v8_enable_webassembly = false"
+          gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-x64-simulator.gni\")"
           ninja -C out/ios-x64-simulator/v8 prebuilds
 
       - name: Upload
@@ -200,12 +214,13 @@ jobs:
           git clean -ffd
 
   windows:
-    runs-on: beefcake-win32-x64
+    runs-on: prebuilds-win32-x64
     environment:
       name: chromium
     name: windows
     env:
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+      CIPD_CACHE_DIR: ${{ github.workspace }}\.cipd_cache
     steps:
       - name: Install
         run: |
@@ -214,6 +229,8 @@ jobs:
           }
 
           "$env:GITHUB_WORKSPACE\depot_tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+          "$env:GITHUB_WORKSPACE\depot_tools\python-bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
           New-Item -ItemType Directory -Force -Path "chromium" | Out-Null
 
@@ -236,10 +253,20 @@ jobs:
           target_cpu = ["x64", "arm64"]
           '@ | Out-File -FilePath ".gclient" -Encoding utf8
 
-          gclient sync -D --revision "src/prebuilds@${{ github.ref }}"
+          if (Test-Path "src/.git" -PathType Container) {
+              New-Item -ItemType Directory -Force -Path "src/.git/info" | Out-Null
+
+              $exclude = "src/.git/info/exclude"
+
+              if (-not ((Test-Path $exclude) -and (@(Get-Content $exclude) -contains "/prebuilds/"))) {
+                  Add-Content -Path $exclude -Value "/prebuilds/"
+              }
+          }
+
+          gclient sync -D --force --revision "src/prebuilds@${{ github.ref }}"
 
           if (-not (Test-Path "buildtools" -PathType Container)) {
-              New-Item -ItemType Junction -Path "buildtools" -Target "src/buildtools" | Out-Null
+              New-Item -ItemType Junction -Path "buildtools" -Target (Resolve-Path "src/buildtools").Path | Out-Null
           }
 
       - name: Patch
