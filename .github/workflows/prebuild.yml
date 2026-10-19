@@ -114,10 +114,10 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git rebase --abort 2>/dev/null || true
-          git checkout --detach 2>/dev/null || true
-          git reset --hard HEAD
-          git clean -ffd
+          gclient recurse --ignore --no-progress -j1 --scm git git rebase --abort 2>/dev/null
+          gclient recurse --ignore --no-progress -j1 --scm git git checkout --quiet --detach
+          gclient recurse --ignore --no-progress -j1 --scm git git reset --quiet --hard HEAD
+          gclient recurse --ignore --no-progress -j1 --scm git git clean -ffdq
 
   apple:
     runs-on: prebuilds-macos-arm64
@@ -213,10 +213,10 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git rebase --abort 2>/dev/null || true
-          git checkout --detach 2>/dev/null || true
-          git reset --hard HEAD
-          git clean -ffd
+          gclient recurse --ignore --no-progress -j1 --scm git git rebase --abort 2>/dev/null
+          gclient recurse --ignore --no-progress -j1 --scm git git checkout --quiet --detach
+          gclient recurse --ignore --no-progress -j1 --scm git git reset --quiet --hard HEAD
+          gclient recurse --ignore --no-progress -j1 --scm git git clean -ffdq
 
   windows:
     runs-on: prebuilds-win32-x64
@@ -304,7 +304,7 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git rebase --abort 2>$null
-          git checkout --detach 2>$null
-          git reset --hard HEAD
-          git clean -ffd
+          gclient recurse --ignore --no-progress -j1 --scm git git rebase --abort 2>$null
+          gclient recurse --ignore --no-progress -j1 --scm git git checkout --quiet --detach
+          gclient recurse --ignore --no-progress -j1 --scm git git reset --quiet --hard HEAD
+          gclient recurse --ignore --no-progress -j1 --scm git git clean -ffdq
