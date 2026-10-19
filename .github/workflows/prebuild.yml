@@ -266,7 +266,7 @@ jobs:
           gclient sync -D --force --revision "src/prebuilds@${{ github.ref }}"
 
           if (-not (Test-Path "buildtools" -PathType Container)) {
-              New-Item -ItemType Junction -Path "buildtools" -Target "src/buildtools" | Out-Null
+              New-Item -ItemType Junction -Path "buildtools" -Target (Resolve-Path "src/buildtools").Path | Out-Null
           }
 
       - name: Patch
