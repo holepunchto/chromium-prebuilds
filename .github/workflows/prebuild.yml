@@ -199,7 +199,7 @@ jobs:
       - name: Build ios-x64-simulator
         working-directory: chromium/src
         run: |
-          gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-x64-simulator.gni\")"
+          gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-x64-simulator.gni\") v8_support_la57 = false"
           ninja -C out/ios-x64-simulator/v8 prebuilds
 
       - name: Upload
