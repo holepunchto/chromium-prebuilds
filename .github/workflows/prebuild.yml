@@ -48,7 +48,7 @@ jobs:
             grep -qxF "/prebuilds/" src/.git/info/exclude 2>/dev/null || echo "/prebuilds/" >> src/.git/info/exclude
           fi
 
-          gclient sync -D --force --revision src/prebuilds@${{ github.ref }}
+          gclient sync -D --force --revision src/prebuilds@$GITHUB_REF
 
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
@@ -99,7 +99,7 @@ jobs:
           ninja -C out/android-x64/v8 prebuilds
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: linux
           path: chromium/src/out/*/v8/obj/prebuilds/*.a
@@ -156,7 +156,7 @@ jobs:
             grep -qxF "/prebuilds/" src/.git/info/exclude 2>/dev/null || echo "/prebuilds/" >> src/.git/info/exclude
           fi
 
-          gclient sync -D --force --revision src/prebuilds@${{ github.ref }}
+          gclient sync -D --force --revision src/prebuilds@$GITHUB_REF
 
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
@@ -198,7 +198,7 @@ jobs:
           ninja -C out/ios-x64-simulator/v8 prebuilds
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: apple
           path: chromium/src/out/*/v8/obj/prebuilds/*.a
@@ -263,7 +263,7 @@ jobs:
               }
           }
 
-          gclient sync -D --force --revision "src/prebuilds@${{ github.ref }}"
+          gclient sync -D --force --revision "src/prebuilds@$env:GITHUB_REF"
 
           if (-not (Test-Path "buildtools" -PathType Container)) {
               New-Item -ItemType Junction -Path "buildtools" -Target (Resolve-Path "src/buildtools").Path | Out-Null
@@ -289,7 +289,7 @@ jobs:
           ninja -C out/win32-x64/v8 prebuilds
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: windows
           path: chromium/src/out/*/v8/obj/prebuilds/*.lib
