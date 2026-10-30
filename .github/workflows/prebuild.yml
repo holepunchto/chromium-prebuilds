@@ -152,7 +152,7 @@ jobs:
               },
             },
           ]
-          target_os = ["macos", "ios"]
+          target_os = ["mac", "ios"]
           target_cpu = ["x64", "arm64"]
           EOF
 
