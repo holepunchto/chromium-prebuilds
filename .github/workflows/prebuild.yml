@@ -5,6 +5,11 @@ permissions:
   contents: read
 concurrency:
   group: ${{ github.workflow }}
+env:
+  GIT_AUTHOR_NAME: github-actions[bot]
+  GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+  GIT_COMMITTER_NAME: github-actions[bot]
+  GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
 jobs:
   linux:
     runs-on: prebuilds-linux-x64
@@ -109,10 +114,10 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git rebase --abort 2>/dev/null || true
-          git checkout --detach 2>/dev/null || true
-          git reset --hard HEAD
-          git clean -ffd
+          gclient recurse --ignore --no-progress -j1 --scm git git rebase --abort 2>/dev/null
+          gclient recurse --ignore --no-progress -j1 --scm git git checkout --quiet --detach
+          gclient recurse --ignore --no-progress -j1 --scm git git reset --quiet --hard HEAD
+          gclient recurse --ignore --no-progress -j1 --scm git git clean -ffdq
 
   apple:
     runs-on: prebuilds-macos-arm64
@@ -194,7 +199,7 @@ jobs:
       - name: Build ios-x64-simulator
         working-directory: chromium/src
         run: |
-          gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-x64-simulator.gni\")"
+          gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-x64-simulator.gni\") v8_support_la57 = false"
           ninja -C out/ios-x64-simulator/v8 prebuilds
 
       - name: Upload
@@ -208,10 +213,10 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git rebase --abort 2>/dev/null || true
-          git checkout --detach 2>/dev/null || true
-          git reset --hard HEAD
-          git clean -ffd
+          gclient recurse --ignore --no-progress -j1 --scm git git rebase --abort 2>/dev/null
+          gclient recurse --ignore --no-progress -j1 --scm git git checkout --quiet --detach
+          gclient recurse --ignore --no-progress -j1 --scm git git reset --quiet --hard HEAD
+          gclient recurse --ignore --no-progress -j1 --scm git git clean -ffdq
 
   windows:
     runs-on: prebuilds-win32-x64
@@ -299,7 +304,7 @@ jobs:
         if: always()
         working-directory: chromium/src
         run: |
-          git rebase --abort 2>$null
-          git checkout --detach 2>$null
-          git reset --hard HEAD
-          git clean -ffd
+          gclient recurse --ignore --no-progress -j1 --scm git git rebase --abort 2>$null
+          gclient recurse --ignore --no-progress -j1 --scm git git checkout --quiet --detach
+          gclient recurse --ignore --no-progress -j1 --scm git git reset --quiet --hard HEAD
+          gclient recurse --ignore --no-progress -j1 --scm git git clean -ffdq
