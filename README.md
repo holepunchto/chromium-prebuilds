@@ -104,7 +104,7 @@ ninja -C out/<target>/<module> prebuilds
 
 ### V8
 
-V8 is built with pointer compression on all 64-bit targets and with the [DrumBrake](https://v8.dev/blog/wasm-interpreter) WebAssembly interpreter on all targets except Android, where DrumBrake is unavailable. DrumBrake allows WebAssembly to run with `--jitless`, which is required on iOS.
+V8 is built with pointer compression on all 64-bit targets and with the DrumBrake WebAssembly interpreter on all targets except Android, where DrumBrake is unavailable. DrumBrake allows WebAssembly to run with `--jitless`, which is required on iOS.
 
 > [!IMPORTANT]
 >
