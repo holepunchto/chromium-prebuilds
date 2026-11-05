@@ -35,3 +35,9 @@ v8_enable_webassembly = true
 # Enable the DrumBrake WebAssembly interpreter, which is required for running
 # WebAssembly in jitless mode. DrumBrake depends on pointer compression.
 v8_enable_drumbrake = true
+
+# Make DrumBrake check memory bounds itself instead of relying on the
+# WebAssembly trap handler, which embedders may not install. This also avoids
+# the `__vectorcall` convention on x64, whose symbol names are mistaken for
+# symbol versions when linking ELF shared libraries.
+v8_drumbrake_bounds_checks = true
