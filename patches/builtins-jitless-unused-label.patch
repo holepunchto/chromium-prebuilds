@@ -1,0 +1,32 @@
+diff --git a/v8/src/builtins/arm64/builtins-arm64.cc b/v8/src/builtins/arm64/builtins-arm64.cc
+index 1bee12b5d5f..61a1731c7ec 100644
+--- a/v8/src/builtins/arm64/builtins-arm64.cc
++++ b/v8/src/builtins/arm64/builtins-arm64.cc
+@@ -402,7 +402,10 @@ static void GetSharedFunctionInfoBytecodeOrBaseline(
+     Label* is_baseline, Label* is_unavailable) {
+   ASM_CODE_COMMENT(masm);
+   DCHECK(!AreAliased(bytecode, scratch1));
+-  Label is_interpreter_data, is_bytecode_array, is_code;
++  Label is_interpreter_data, is_bytecode_array;
++#if !V8_JITLESS_BOOL
++  Label is_code;
++#endif
+ 
+   Register data = bytecode;
+   __ LoadTrustedUnknownPointerField(
+diff --git a/v8/src/builtins/x64/builtins-x64.cc b/v8/src/builtins/x64/builtins-x64.cc
+index 87672210920..1930d6e3167 100644
+--- a/v8/src/builtins/x64/builtins-x64.cc
++++ b/v8/src/builtins/x64/builtins-x64.cc
+@@ -724,7 +724,10 @@ static void GetSharedFunctionInfoBytecodeOrBaseline(
+     MacroAssembler* masm, Register sfi, Register bytecode, Register scratch1,
+     Label* is_baseline, Label* is_unavailable) {
+   ASM_CODE_COMMENT(masm);
+-  Label is_interpreter_data, is_bytecode_array, is_code;
++  Label is_interpreter_data, is_bytecode_array;
++#if !V8_JITLESS_BOOL
++  Label is_code;
++#endif
+ 
+   Register data = bytecode;
+   __ LoadTrustedUnknownPointerField(
