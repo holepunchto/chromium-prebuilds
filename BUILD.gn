@@ -1,7 +1,3 @@
-declare_args() {
-  is_prebuild = false
-}
-
 template("static_prebuild") {
   static_library(target_name) {
     complete_static_lib = true
@@ -21,57 +17,13 @@ static_prebuild("c++") {
   ]
 }
 
-if (is_prebuild == "v8") {
-  static_prebuild("v8") {
-    deps = [
-      ":c++",
-      "//v8:v8",
-    ]
-  }
-}
-
-if (is_prebuild == "content") {
-  static_prebuild("content") {
-    deps = [
-      ":c++",
-      "//content/public/app",
-      "//content/public/browser",
-      "//content/public/child",
-      "//content/public/common",
-      "//content/public/gpu",
-      "//content/public/renderer",
-      "//content/public/utility",
-    ]
-
-    if (is_mac) {
-      deps += [
-        "//base/allocator:early_zone_registration_apple"
-      ]
-    }
-  }
-}
-
-if (is_prebuild == "webrtc") {
-  static_prebuild("webrtc") {
-    deps = [
-      ":c++",
-      "//third_party/webrtc_overrides:webrtc_component",
-    ]
-  }
+static_prebuild("v8") {
+  deps = [
+    ":c++",
+    "//v8:v8",
+  ]
 }
 
 group("prebuilds") {
-  deps = []
-
-  if (is_prebuild == "v8") {
-    deps += [ ":v8" ]
-  }
-
-  if (is_prebuild == "content") {
-    deps += [ ":content" ]
-  }
-
-  if (is_prebuild == "webrtc") {
-    deps += [ ":webrtc" ]
-  }
+  deps = [ ":v8" ]
 }

@@ -1,0 +1,6 @@
+import("//prebuilds/v8.gni")
+import("//prebuilds/mode/release.gni")
+import("//prebuilds/target/android-arm64.gni")
+
+# Disable DrumBrake as it is unavailable on Android.
+v8_enable_drumbrake = false

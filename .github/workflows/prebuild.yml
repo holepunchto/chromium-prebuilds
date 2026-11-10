@@ -70,37 +70,37 @@ jobs:
       - name: Build linux-arm64
         working-directory: chromium/src
         run: |
-          gn gen out/linux-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-arm64.gni\")"
+          gn gen out/linux-arm64/v8 --args="import(\"//prebuilds/v8-linux-arm64-release.gni\")"
           ninja -C out/linux-arm64/v8 prebuilds
 
       - name: Build linux-x64
         working-directory: chromium/src
         run: |
-          gn gen out/linux-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-x64.gni\")"
+          gn gen out/linux-x64/v8 --args="import(\"//prebuilds/v8-linux-x64-release.gni\")"
           ninja -C out/linux-x64/v8 prebuilds
 
       - name: Build android-arm
         working-directory: chromium/src
         run: |
-          gn gen out/android-arm/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm.gni\") v8_enable_drumbrake = false"
+          gn gen out/android-arm/v8 --args="import(\"//prebuilds/v8-android-arm-release.gni\")"
           ninja -C out/android-arm/v8 prebuilds
 
       - name: Build android-arm64
         working-directory: chromium/src
         run: |
-          gn gen out/android-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-arm64.gni\") v8_enable_drumbrake = false"
+          gn gen out/android-arm64/v8 --args="import(\"//prebuilds/v8-android-arm64-release.gni\")"
           ninja -C out/android-arm64/v8 prebuilds
 
       - name: Build android-ia32
         working-directory: chromium/src
         run: |
-          gn gen out/android-ia32/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-ia32.gni\") v8_enable_drumbrake = false"
+          gn gen out/android-ia32/v8 --args="import(\"//prebuilds/v8-android-ia32-release.gni\")"
           ninja -C out/android-ia32/v8 prebuilds
 
       - name: Build android-x64
         working-directory: chromium/src
         run: |
-          gn gen out/android-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/android-x64.gni\") v8_enable_drumbrake = false"
+          gn gen out/android-x64/v8 --args="import(\"//prebuilds/v8-android-x64-release.gni\")"
           ninja -C out/android-x64/v8 prebuilds
 
       - name: Upload
@@ -175,31 +175,31 @@ jobs:
       - name: Build darwin-arm64
         working-directory: chromium/src
         run: |
-          gn gen out/darwin-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/darwin-arm64.gni\")"
+          gn gen out/darwin-arm64/v8 --args="import(\"//prebuilds/v8-darwin-arm64-release.gni\")"
           ninja -C out/darwin-arm64/v8 prebuilds
 
       - name: Build darwin-x64
         working-directory: chromium/src
         run: |
-          gn gen out/darwin-x64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/darwin-x64.gni\")"
+          gn gen out/darwin-x64/v8 --args="import(\"//prebuilds/v8-darwin-x64-release.gni\")"
           ninja -C out/darwin-x64/v8 prebuilds
 
       - name: Build ios-arm64
         working-directory: chromium/src
         run: |
-          gn gen out/ios-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-arm64.gni\")"
+          gn gen out/ios-arm64/v8 --args="import(\"//prebuilds/v8-ios-arm64-release.gni\")"
           ninja -C out/ios-arm64/v8 prebuilds
 
       - name: Build ios-arm64-simulator
         working-directory: chromium/src
         run: |
-          gn gen out/ios-arm64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-arm64-simulator.gni\")"
+          gn gen out/ios-arm64-simulator/v8 --args="import(\"//prebuilds/v8-ios-arm64-simulator-release.gni\")"
           ninja -C out/ios-arm64-simulator/v8 prebuilds
 
       - name: Build ios-x64-simulator
         working-directory: chromium/src
         run: |
-          gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/ios-x64-simulator.gni\") v8_support_la57 = false v8_enable_webassembly = false v8_enable_drumbrake = false"
+          gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8-ios-x64-simulator-release.gni\")"
           ninja -C out/ios-x64-simulator/v8 prebuilds
 
       - name: Upload
@@ -284,13 +284,13 @@ jobs:
       - name: Build win32-arm64
         working-directory: chromium/src
         run: |
-          gn gen out/win32-arm64/v8 --args="import(\`"//prebuilds/v8.gni\`") import(\`"//prebuilds/mode/release.gni\`") import(\`"//prebuilds/target/win32-arm64.gni\`")"
+          gn gen out/win32-arm64/v8 --args="import(\`"//prebuilds/v8-win32-arm64-release.gni\`")"
           ninja -C out/win32-arm64/v8 prebuilds
 
       - name: Build win32-x64
         working-directory: chromium/src
         run: |
-          gn gen out/win32-x64/v8 --args="import(\`"//prebuilds/v8.gni\`") import(\`"//prebuilds/mode/release.gni\`") import(\`"//prebuilds/target/win32-x64.gni\`")"
+          gn gen out/win32-x64/v8 --args="import(\`"//prebuilds/v8-win32-x64-release.gni\`")"
           ninja -C out/win32-x64/v8 prebuilds
 
       - name: Upload

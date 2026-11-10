@@ -56,7 +56,7 @@ To build the various Chromium modules, start by changing into the `src/` directo
 cd src
 ```
 
-Next, generate a build system using `gn` for your desired target and module, replacing `<target>` with one of the supported targets as defined by [`target/`](target/) and `<module>` with one of `v8`, `content`, or `webrtc`:
+Next, generate a build system using `gn` by importing the definition for your desired module, target, and mode, replacing `<target>` with one of the supported targets as defined by [`target/`](target/) and `<module>` with `v8`. The definition also holds any overrides that the target needs. iOS targets only support release builds.
 
 > [!NOTE]
 >
@@ -64,12 +64,12 @@ Next, generate a build system using `gn` for your desired target and module, rep
 
 ```sh
 # POSIX
-gn gen out/<target>/<module> --args="import(\"//prebuilds/<module>.gni\") import(\"//prebuilds/mode/<release|debug>.gni\") import(\"//prebuilds/target/<target>.gni\")"
+gn gen out/<target>/<module> --args="import(\"//prebuilds/<module>-<target>-<release|debug>.gni\")"
 ```
 
 ```pwsh
 # Windows
-gn gen out/<target>/<module> --args="import(\`"//prebuilds/<module>.gni\`") import(\`"//prebuilds/mode/<release|debug>.gni\`") import(\`"//prebuilds/target/<target>.gni\`")"
+gn gen out/<target>/<module> --args="import(\`"//prebuilds/<module>-<target>-<release|debug>.gni\`")"
 ```
 
 > [!TIP]
@@ -79,19 +79,19 @@ gn gen out/<target>/<module> --args="import(\`"//prebuilds/<module>.gni\`") impo
 > To make a release build of V8 for Linux 64-bit ARM, do:
 >
 > ```sh
-> gn gen out/linux-arm64/v8 --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/release.gni\") import(\"//prebuilds/target/linux-arm64.gni\")"
+> gn gen out/linux-arm64/v8 --args="import(\"//prebuilds/v8-linux-arm64-release.gni\")"
 > ```
 >
 > To make a release build of V8 for Windows 64-bit Intel, do:
 >
-> ```sh
-> gn gen out/win32-x64/v8 --args="import(\`"//prebuilds/v8.gni\`") import(\`"//prebuilds/mode/release.gni\`") import(\`"//prebuilds/target/win32-x64.gni\`")"
+> ```pwsh
+> gn gen out/win32-x64/v8 --args="import(\`"//prebuilds/v8-win32-x64-release.gni\`")"
 > ```
 >
 > To make a debug build of V8 for macOS 64-bit ARM instrumented with AddressSanitizer, do:
 >
 > ```sh
-> gn gen out/darwin-arm64/v8-asan --args="import(\"//prebuilds/v8.gni\") import(\"//prebuilds/mode/debug.gni\") import(\"//prebuilds/target/darwin-arm64.gni\") import(\"//prebuilds/sanitizer/address.gni\")"
+> gn gen out/darwin-arm64/v8-asan --args="import(\"//prebuilds/v8-darwin-arm64-debug.gni\") import(\"//prebuilds/sanitizer/address.gni\")"
 > ```
 
 Finally, run the build system for the `prebuilds` target:

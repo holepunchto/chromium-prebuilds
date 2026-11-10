@@ -1,0 +1,9 @@
+import("//prebuilds/v8.gni")
+import("//prebuilds/mode/release.gni")
+import("//prebuilds/target/ios-arm64.gni")
+
+# Enable lite mode explicitly as V8 otherwise derives it from Blink, which the
+# macOS host toolchain forces on for iOS builds. The host built `mksnapshot`
+# would then make a startup snapshot for a JIT enabled V8, which the jitless
+# target rejects at runtime.
+v8_enable_lite_mode = true

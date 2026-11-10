@@ -1,7 +1,5 @@
 import("//prebuilds/common.gni")
 
-is_prebuild = "v8"
-
 # Disable loading of external startup data as it is not supported on all
 # platforms. Startup data can still be embedded in binaries.
 v8_use_external_startup_data = false

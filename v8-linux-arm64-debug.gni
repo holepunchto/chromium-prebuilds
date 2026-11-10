@@ -1,0 +1,3 @@
+import("//prebuilds/v8.gni")
+import("//prebuilds/mode/debug.gni")
+import("//prebuilds/target/linux-arm64.gni")
