@@ -13,3 +13,7 @@ is_component_build = false
 # Don't use a separate data file for ICU, but embed it statically instead.
 # This increases executable size, but simplifies distribution.
 icu_use_data_file = false
+
+# Disable WebUI code cache generation, which needs external startup data when
+# the host and target CPUs differ, such as for macOS x64 on an arm64 host.
+enable_webui_generate_code_cache = false
