@@ -13,6 +13,11 @@ v8_enable_gdbjit = false
 # https://gn.issues.chromium.org/issues/42440276
 v8_enable_temporal_support = false
 
+# Write the definitions that the public headers depend on to the generated
+# `v8-gn.h` rather than passing them on the command line, so that the headers
+# carry the configuration that consumers must match.
+v8_generate_external_defines_header = true
+
 # Enable the monolithic V8 build.
 v8_monolithic = true
 
