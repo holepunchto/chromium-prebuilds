@@ -53,7 +53,7 @@ jobs:
             grep -qxF "/prebuilds/" src/.git/info/exclude 2>/dev/null || echo "/prebuilds/" >> src/.git/info/exclude
           fi
 
-          gclient sync -D --force --revision src/prebuilds@$GITHUB_REF
+          gclient sync -D --force -j 4 --revision src/prebuilds@$GITHUB_REF
 
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           ./src/build/linux/sysroot_scripts/install-sysroot.py --arch=x64
@@ -161,7 +161,7 @@ jobs:
             grep -qxF "/prebuilds/" src/.git/info/exclude 2>/dev/null || echo "/prebuilds/" >> src/.git/info/exclude
           fi
 
-          gclient sync -D --force --revision src/prebuilds@$GITHUB_REF
+          gclient sync -D --force -j 4 --revision src/prebuilds@$GITHUB_REF
 
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
@@ -268,7 +268,7 @@ jobs:
               }
           }
 
-          gclient sync -D --force --revision "src/prebuilds@$env:GITHUB_REF"
+          gclient sync -D --force -j 4 --revision "src/prebuilds@$env:GITHUB_REF"
 
           if (-not (Test-Path "buildtools" -PathType Container)) {
               New-Item -ItemType Junction -Path "buildtools" -Target (Resolve-Path "src/buildtools").Path | Out-Null
