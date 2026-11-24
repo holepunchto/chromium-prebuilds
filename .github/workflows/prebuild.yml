@@ -11,11 +11,38 @@ env:
   GIT_COMMITTER_NAME: github-actions[bot]
   GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    name: Version
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: holepunchto/actions/checkout@v1
+      - id: version
+        name: Version
+        run: |
+          version=$(sed -n 's/^ *"chromium_version": "\(.*\)",$/\1/p' DEPS)
+
+          if [ -z "$version" ]; then
+            echo "::error::No Chromium version found in DEPS"
+            exit 1
+          fi
+
+          if gh release view "v$version" > /dev/null 2>&1; then
+            echo "::error::Release v$version already exists"
+            exit 1
+          fi
+
+          echo "version=$version" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+
   linux:
     runs-on: prebuilds-linux-x64
     environment:
       name: chromium
-    name: linux
+    needs: version
+    name: Linux
     steps:
       - name: Install
         run: |
@@ -28,6 +55,13 @@ jobs:
           echo "$GITHUB_WORKSPACE/depot_tools/python-bin" >> $GITHUB_PATH
 
           mkdir -p chromium
+
+      - id: git-cache
+        uses: holepunchto/actions/cache/restore@v1
+        with:
+          path: .git_cache
+          key: git-cache-linux-${{ needs.version.outputs.version }}
+          restore-keys: git-cache-linux-
 
       - name: Download
         working-directory: chromium
@@ -46,6 +80,7 @@ jobs:
           ]
           target_os = ["linux", "android"]
           target_cpu = ["x64", "x86", "arm64", "arm"]
+          cache_dir = "$GITHUB_WORKSPACE/.git_cache"
           EOF
 
           if [ -d src/.git ]; then
@@ -62,52 +97,86 @@ jobs:
             ln -s src/buildtools buildtools
           fi
 
+      - if: steps.git-cache.outputs.cache-hit != 'true'
+        uses: holepunchto/actions/cache/save@v1
+        with:
+          path: .git_cache
+          key: git-cache-linux-${{ needs.version.outputs.version }}
+
       - name: Patch
         working-directory: chromium
-        run: |
-          git apply --directory src src/prebuilds/patches/*.patch
+        run: git apply --directory src src/prebuilds/patches/*.patch
 
-      - name: Build linux-arm64
-        working-directory: chromium/src
-        run: |
-          gn gen out/linux-arm64/v8 --args="import(\"//prebuilds/v8-linux-arm64-release.gni\")"
-          ninja -C out/linux-arm64/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/linux-arm64/v8 --args="import(\"//prebuilds/v8-linux-arm64-release.gni\")"
+      - working-directory: chromium/src
+        run: ninja -C out/linux-arm64/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/linux-arm64/v8/package
+          paths: v8 c++
+          name: archives/linux-arm64
+          format: tar.xz
 
-      - name: Build linux-x64
-        working-directory: chromium/src
-        run: |
-          gn gen out/linux-x64/v8 --args="import(\"//prebuilds/v8-linux-x64-release.gni\")"
-          ninja -C out/linux-x64/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/linux-x64/v8 --args="import(\"//prebuilds/v8-linux-x64-release.gni\")"
+      - working-directory: chromium/src
+        run: ninja -C out/linux-x64/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/linux-x64/v8/package
+          paths: v8 c++
+          name: archives/linux-x64
+          format: tar.xz
 
-      - name: Build android-arm
-        working-directory: chromium/src
-        run: |
-          gn gen out/android-arm/v8 --args="import(\"//prebuilds/v8-android-arm-release.gni\")"
-          ninja -C out/android-arm/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/android-arm/v8 --args="import(\"//prebuilds/v8-android-arm-release.gni\")"
+      - working-directory: chromium/src
+        run: ninja -C out/android-arm/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/android-arm/v8/package
+          paths: v8 c++
+          name: archives/android-arm
+          format: tar.xz
 
-      - name: Build android-arm64
-        working-directory: chromium/src
-        run: |
-          gn gen out/android-arm64/v8 --args="import(\"//prebuilds/v8-android-arm64-release.gni\")"
-          ninja -C out/android-arm64/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/android-arm64/v8 --args="import(\"//prebuilds/v8-android-arm64-release.gni\")"
+      - working-directory: chromium/src
+        run: ninja -C out/android-arm64/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/android-arm64/v8/package
+          paths: v8 c++
+          name: archives/android-arm64
+          format: tar.xz
 
-      - name: Build android-ia32
-        working-directory: chromium/src
-        run: |
-          gn gen out/android-ia32/v8 --args="import(\"//prebuilds/v8-android-ia32-release.gni\")"
-          ninja -C out/android-ia32/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/android-ia32/v8 --args="import(\"//prebuilds/v8-android-ia32-release.gni\")"
+      - working-directory: chromium/src
+        run: ninja -C out/android-ia32/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/android-ia32/v8/package
+          paths: v8 c++
+          name: archives/android-ia32
+          format: tar.xz
 
-      - name: Build android-x64
-        working-directory: chromium/src
-        run: |
-          gn gen out/android-x64/v8 --args="import(\"//prebuilds/v8-android-x64-release.gni\")"
-          ninja -C out/android-x64/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/android-x64/v8 --args="import(\"//prebuilds/v8-android-x64-release.gni\")"
+      - working-directory: chromium/src
+        run: ninja -C out/android-x64/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/android-x64/v8/package
+          paths: v8 c++
+          name: archives/android-x64
+          format: tar.xz
 
-      - name: Upload
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      - uses: holepunchto/actions/upload-artifact@v1
         with:
           name: linux
-          path: chromium/src/out/*/v8/obj/prebuilds/*.a
+          path: archives/*.tar.xz
           retention-days: 5
 
       - name: Clean
@@ -119,11 +188,14 @@ jobs:
           gclient recurse --ignore --no-progress -j1 --scm git git reset --quiet --hard HEAD
           gclient recurse --ignore --no-progress -j1 --scm git git clean -ffdq
 
+          rm -rf "$GITHUB_WORKSPACE/archives"
+
   apple:
     runs-on: prebuilds-macos-arm64
     environment:
       name: chromium
-    name: apple
+    needs: version
+    name: Apple
     steps:
       - name: Install
         run: |
@@ -136,6 +208,13 @@ jobs:
           echo "$GITHUB_WORKSPACE/depot_tools/python-bin" >> $GITHUB_PATH
 
           mkdir -p chromium
+
+      - id: git-cache
+        uses: holepunchto/actions/cache/restore@v1
+        with:
+          path: .git_cache
+          key: git-cache-apple-${{ needs.version.outputs.version }}
+          restore-keys: git-cache-apple-
 
       - name: Download
         working-directory: chromium
@@ -154,6 +233,7 @@ jobs:
           ]
           target_os = ["mac", "ios"]
           target_cpu = ["x64", "arm64"]
+          cache_dir = "$GITHUB_WORKSPACE/.git_cache"
           EOF
 
           if [ -d src/.git ]; then
@@ -167,46 +247,75 @@ jobs:
             ln -s src/buildtools buildtools
           fi
 
+      - if: steps.git-cache.outputs.cache-hit != 'true'
+        uses: holepunchto/actions/cache/save@v1
+        with:
+          path: .git_cache
+          key: git-cache-apple-${{ needs.version.outputs.version }}
+
       - name: Patch
         working-directory: chromium
-        run: |
-          git apply --directory src src/prebuilds/patches/*.patch
+        run: git apply --directory src src/prebuilds/patches/*.patch
 
-      - name: Build darwin-arm64
-        working-directory: chromium/src
-        run: |
-          gn gen out/darwin-arm64/v8 --args="import(\"//prebuilds/v8-darwin-arm64-release.gni\")"
-          ninja -C out/darwin-arm64/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/darwin-arm64/v8 --args="import(\"//prebuilds/v8-darwin-arm64-release.gni\")"
+      - working-directory: chromium/src
+        run: ninja -C out/darwin-arm64/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/darwin-arm64/v8/package
+          paths: v8 c++
+          name: archives/darwin-arm64
+          format: tar.xz
 
-      - name: Build darwin-x64
-        working-directory: chromium/src
-        run: |
-          gn gen out/darwin-x64/v8 --args="import(\"//prebuilds/v8-darwin-x64-release.gni\")"
-          ninja -C out/darwin-x64/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/darwin-x64/v8 --args="import(\"//prebuilds/v8-darwin-x64-release.gni\")"
+      - working-directory: chromium/src
+        run: ninja -C out/darwin-x64/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/darwin-x64/v8/package
+          paths: v8 c++
+          name: archives/darwin-x64
+          format: tar.xz
 
-      - name: Build ios-arm64
-        working-directory: chromium/src
-        run: |
-          gn gen out/ios-arm64/v8 --args="import(\"//prebuilds/v8-ios-arm64-release.gni\")"
-          ninja -C out/ios-arm64/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/ios-arm64/v8 --args="import(\"//prebuilds/v8-ios-arm64-release.gni\")"
+      - working-directory: chromium/src
+        run: ninja -C out/ios-arm64/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/ios-arm64/v8/package
+          paths: v8 c++
+          name: archives/ios-arm64
+          format: tar.xz
 
-      - name: Build ios-arm64-simulator
-        working-directory: chromium/src
-        run: |
-          gn gen out/ios-arm64-simulator/v8 --args="import(\"//prebuilds/v8-ios-arm64-simulator-release.gni\")"
-          ninja -C out/ios-arm64-simulator/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/ios-arm64-simulator/v8 --args="import(\"//prebuilds/v8-ios-arm64-simulator-release.gni\")"
+      - working-directory: chromium/src
+        run: ninja -C out/ios-arm64-simulator/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/ios-arm64-simulator/v8/package
+          paths: v8 c++
+          name: archives/ios-arm64-simulator
+          format: tar.xz
 
-      - name: Build ios-x64-simulator
-        working-directory: chromium/src
-        run: |
-          gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8-ios-x64-simulator-release.gni\")"
-          ninja -C out/ios-x64-simulator/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/ios-x64-simulator/v8 --args="import(\"//prebuilds/v8-ios-x64-simulator-release.gni\")"
+      - working-directory: chromium/src
+        run: ninja -C out/ios-x64-simulator/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/ios-x64-simulator/v8/package
+          paths: v8 c++
+          name: archives/ios-x64-simulator
+          format: tar.xz
 
-      - name: Upload
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      - uses: holepunchto/actions/upload-artifact@v1
         with:
           name: apple
-          path: chromium/src/out/*/v8/obj/prebuilds/*.a
+          path: archives/*.tar.xz
           retention-days: 5
 
       - name: Clean
@@ -218,11 +327,14 @@ jobs:
           gclient recurse --ignore --no-progress -j1 --scm git git reset --quiet --hard HEAD
           gclient recurse --ignore --no-progress -j1 --scm git git clean -ffdq
 
+          rm -rf "$GITHUB_WORKSPACE/archives"
+
   windows:
     runs-on: prebuilds-win32-x64
     environment:
       name: chromium
-    name: windows
+    needs: version
+    name: Windows
     env:
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
       CIPD_CACHE_DIR: ${{ github.workspace }}\.cipd_cache
@@ -238,6 +350,13 @@ jobs:
           "$env:GITHUB_WORKSPACE\depot_tools\python-bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
           New-Item -ItemType Directory -Force -Path "chromium" | Out-Null
+
+      - id: git-cache
+        uses: holepunchto/actions/cache/restore@v1
+        with:
+          path: .git_cache
+          key: git-cache-windows-${{ needs.version.outputs.version }}
+          restore-keys: git-cache-windows-
 
       - name: Download
         working-directory: chromium
@@ -256,6 +375,7 @@ jobs:
           ]
           target_os = ["win"]
           target_cpu = ["x64", "arm64"]
+          cache_dir = r"${{ github.workspace }}\.git_cache"
           '@ | Out-File -FilePath ".gclient" -Encoding utf8
 
           if (Test-Path "src/.git" -PathType Container) {
@@ -274,6 +394,12 @@ jobs:
               New-Item -ItemType Junction -Path "buildtools" -Target (Resolve-Path "src/buildtools").Path | Out-Null
           }
 
+      - if: steps.git-cache.outputs.cache-hit != 'true'
+        uses: holepunchto/actions/cache/save@v1
+        with:
+          path: .git_cache
+          key: git-cache-windows-${{ needs.version.outputs.version }}
+
       - name: Patch
         working-directory: chromium
         run: |
@@ -281,23 +407,32 @@ jobs:
             git apply --directory src $_.FullName
           }
 
-      - name: Build win32-arm64
-        working-directory: chromium/src
-        run: |
-          gn gen out/win32-arm64/v8 --args="import(\`"//prebuilds/v8-win32-arm64-release.gni\`")"
-          ninja -C out/win32-arm64/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/win32-arm64/v8 --args="import(\`"//prebuilds/v8-win32-arm64-release.gni\`")"
+      - working-directory: chromium/src
+        run: ninja -C out/win32-arm64/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/win32-arm64/v8/package
+          paths: v8 c++
+          name: archives/win32-arm64
+          format: tar.xz
 
-      - name: Build win32-x64
-        working-directory: chromium/src
-        run: |
-          gn gen out/win32-x64/v8 --args="import(\`"//prebuilds/v8-win32-x64-release.gni\`")"
-          ninja -C out/win32-x64/v8 prebuilds
+      - working-directory: chromium/src
+        run: gn gen out/win32-x64/v8 --args="import(\`"//prebuilds/v8-win32-x64-release.gni\`")"
+      - working-directory: chromium/src
+        run: ninja -C out/win32-x64/v8 prebuilds
+      - uses: holepunchto/actions/create-archive@v1
+        with:
+          directory: chromium/src/out/win32-x64/v8/package
+          paths: v8 c++
+          name: archives/win32-x64
+          format: tar.xz
 
-      - name: Upload
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      - uses: holepunchto/actions/upload-artifact@v1
         with:
           name: windows
-          path: chromium/src/out/*/v8/obj/prebuilds/*.lib
+          path: archives/*.tar.xz
           retention-days: 5
 
       - name: Clean
@@ -308,3 +443,34 @@ jobs:
           gclient recurse --ignore --no-progress -j1 --scm git git checkout --quiet --detach
           gclient recurse --ignore --no-progress -j1 --scm git git reset --quiet --hard HEAD
           gclient recurse --ignore --no-progress -j1 --scm git git clean -ffdq
+
+          Remove-Item -Recurse -Force "$env:GITHUB_WORKSPACE/archives" -ErrorAction SilentlyContinue
+
+  release:
+    runs-on: ubuntu-latest
+    environment:
+      name: github
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    needs:
+      - linux
+      - apple
+      - windows
+    name: Release
+    steps:
+      - uses: holepunchto/actions/checkout@v1
+      - uses: holepunchto/actions/download-prebuilds@v1
+        with:
+          prefix: archives
+      - working-directory: archives
+        run: sha256sum *.tar.xz > SHA256SUMS
+      - uses: holepunchto/actions/attest@v1
+        with:
+          subject-path: archives/*.tar.xz
+      - uses: holepunchto/actions/create-github-release@v1
+        with:
+          tag: v${{ needs.version.outputs.version }}
+          files: archives/*.tar.xz archives/SHA256SUMS
+          draft: true

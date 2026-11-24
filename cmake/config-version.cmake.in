@@ -1,0 +1,18 @@
+set(PACKAGE_VERSION "@VERSION@")
+
+# Code compiled against the headers of one prebuild only works with the
+# libraries of that same prebuild, so only an exact version is compatible.
+if(PACKAGE_FIND_VERSION STREQUAL "" OR PACKAGE_FIND_VERSION VERSION_EQUAL PACKAGE_VERSION)
+  set(PACKAGE_VERSION_COMPATIBLE TRUE)
+else()
+  set(PACKAGE_VERSION_COMPATIBLE FALSE)
+endif()
+
+if(PACKAGE_FIND_VERSION VERSION_EQUAL PACKAGE_VERSION)
+  set(PACKAGE_VERSION_EXACT TRUE)
+endif()
+
+# Libraries built for a different pointer size can't be linked.
+if(NOT CMAKE_SIZEOF_VOID_P STREQUAL "" AND NOT CMAKE_SIZEOF_VOID_P STREQUAL "@SIZEOF_VOID_P@")
+  set(PACKAGE_VERSION_UNSUITABLE TRUE)
+endif()

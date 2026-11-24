@@ -1,3 +1,125 @@
+import("//build/config/c++/c++.gni")
+import("//build/config/sanitizers/sanitizers.gni")
+import("//buildtools/third_party/libc++/libcxx_headers.gni")
+import("//v8/gni/v8.gni")
+
+# Each package is an installable CMake prefix of its own, as laid out by
+# `cmake-gn`.
+package_dir = "$root_out_dir/package"
+
+chromium_version = read_file("//chrome/VERSION", "scope")
+
+package_version = string_join(".",
+                              [
+                                "${chromium_version.MAJOR}",
+                                "${chromium_version.MINOR}",
+                                "${chromium_version.BUILD}",
+                                "${chromium_version.PATCH}",
+                              ])
+
+if (current_cpu == "x64" || current_cpu == "arm64") {
+  sizeof_void_p = "8"
+} else {
+  sizeof_void_p = "4"
+}
+
+# The definitions that `//build/config/c++:runtime_library` and
+# `//build/config/compiler:runtime_library` derive from the GN arguments. They
+# are added to the fixed definitions of `//buildtools/third_party/libc++` in the
+# generated `__config_site`, and must be kept in sync with Chromium.
+libcxx_config_site_defines = []
+
+if (!libcxx_is_shared) {
+  libcxx_config_site_defines += [ "_LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS" ]
+
+  if (!export_libcxxabi_from_executables && !is_win) {
+    libcxx_config_site_defines +=
+        [ "_LIBCXXABI_DISABLE_VISIBILITY_ANNOTATIONS" ]
+  }
+}
+
+if (enable_iterator_debugging) {
+  libcxx_config_site_defines += [ "_LIBCPP_ENABLE_DEBUG_MODE" ]
+}
+
+if (is_asan && !use_fuzzing_engine && !is_apple) {
+  libcxx_config_site_defines += [ "_LIBCPP_INSTRUMENTED_WITH_ASAN 1" ]
+} else {
+  libcxx_config_site_defines += [ "_LIBCPP_INSTRUMENTED_WITH_ASAN 0" ]
+}
+
+if (use_safe_libcxx) {
+  libcxx_config_site_defines +=
+      [ "_LIBCPP_HARDENING_MODE _LIBCPP_HARDENING_MODE_EXTENSIVE" ]
+} else {
+  libcxx_config_site_defines +=
+      [ "_LIBCPP_HARDENING_MODE _LIBCPP_HARDENING_MODE_NONE" ]
+}
+
+# The container annotations of libc++ are applied by inline code, which the
+# linker deduplicates across the program. A consumer built with ASan would
+# annotate containers that the uninstrumented prebuild then changes without
+# updating the annotations, so disable them unless the prebuild is
+# instrumented as well. The value matches that of `-D`, so that a consumer that
+# also defines it doesn't redefine it differently.
+if (!is_asan) {
+  libcxx_config_site_defines += [ "__SANITIZER_DISABLE_CONTAINER_OVERFLOW__ 1" ]
+}
+
+libcxx_public_cflags = []
+libcxx_public_cflags_cc = []
+libcxx_public_ldflags = []
+
+if (is_win) {
+  # Matches `//build/config/win:static_crt`.
+  if (is_debug) {
+    libcxx_public_cflags += [ "/MTd" ]
+    libcxx_public_ldflags += [ "/DEFAULTLIB:libcpmtd.lib" ]
+  } else {
+    libcxx_public_cflags += [ "/MT" ]
+    libcxx_public_ldflags += [ "/DEFAULTLIB:libcpmt.lib" ]
+  }
+} else {
+  libcxx_public_cflags_cc += [ "-nostdinc++" ]
+  libcxx_public_ldflags += [ "-nostdlib++" ]
+}
+
+v8_public_defines = [ "V8_GN_HEADER" ]
+
+if (is_win) {
+  v8_public_cflags_cc = [ "/GR-" ]
+} else {
+  v8_public_cflags_cc = [ "-fno-rtti" ]
+}
+
+# The platform libraries that V8 links. iOS leaves out BrowserEngineKit, which
+# V8 only uses when targeting iOS 17.4 or later.
+v8_public_libs = []
+v8_public_frameworks = []
+
+if (is_linux) {
+  v8_public_libs += [
+    "dl",
+    "m",
+    "pthread",
+    "rt",
+  ]
+} else if (is_android) {
+  v8_public_libs += [ "log" ]
+} else if (is_apple) {
+  v8_public_frameworks += [ "Foundation.framework" ]
+} else if (is_win) {
+  v8_public_libs += [
+    "dbghelp.lib",
+    "winmm.lib",
+    "ws2_32.lib",
+  ]
+
+  if (v8_enable_etw_stack_walking) {
+    v8_public_libs += [ "advapi32.lib" ]
+  }
+}
+
 template("static_prebuild") {
   static_library(target_name) {
     complete_static_lib = true
@@ -6,24 +128,380 @@ template("static_prebuild") {
   }
 }
 
+template("copy_headers") {
+  action(target_name) {
+    forward_variables_from(invoker,
+                           [
+                             "deps",
+                             "inputs",
+                           ])
+
+    visibility = [ ":*" ]
+
+    script = "copy_headers.py"
+
+    _stamp = "$target_gen_dir/$target_name.stamp"
+
+    outputs = [ _stamp ]
+
+    depfile = "$target_gen_dir/$target_name.d"
+
+    args = [
+      "--output",
+      rebase_path(invoker.output, root_build_dir),
+      "--stamp",
+      rebase_path(_stamp, root_build_dir),
+      "--depfile",
+      rebase_path(depfile, root_build_dir),
+    ]
+
+    if (defined(invoker.trees)) {
+      foreach(tree, invoker.trees) {
+        args += [
+          "--tree",
+          rebase_path(tree, root_build_dir),
+        ]
+      }
+    }
+
+    # The files are listed in a response file, as there are too many of them
+    # for the command line on Windows.
+    response_file_contents = []
+
+    foreach(entry, invoker.files) {
+      _base = rebase_path(entry[0], root_build_dir)
+
+      foreach(file, entry[1]) {
+        response_file_contents += [
+          "--file",
+          _base,
+          rebase_path(file, root_build_dir),
+        ]
+      }
+    }
+
+    args += [ "@{{response_file_name}}" ]
+  }
+}
+
+# Writes the source file with `@<key>@` replaced by the value of each
+# substitution, and with the lines of `prepend` before it.
+template("configure_file") {
+  generated_file(target_name) {
+    visibility = [ ":*" ]
+
+    outputs = [ invoker.output ]
+
+    output_conversion = "list lines"
+
+    # Reading the file as lines would trim the whitespace of each one.
+    _content = read_file(invoker.source, "string")
+
+    if (defined(invoker.substitutions)) {
+      foreach(substitution, invoker.substitutions) {
+        _key = substitution[0]
+        _content = string_replace(_content, "@$_key@", substitution[1])
+      }
+    }
+
+    contents = []
+
+    if (defined(invoker.prepend)) {
+      contents += invoker.prepend
+    }
+
+    # Writing the lines ends each one with a newline, so the empty string after
+    # the final newline of the source is left out.
+    _first = true
+    _previous = ""
+
+    foreach(line, string_split(_content, "$0x0A")) {
+      if (!_first) {
+        contents += [ _previous ]
+      }
+
+      _first = false
+      _previous = line
+    }
+
+    if (_previous != "") {
+      contents += [ _previous ]
+    }
+  }
+}
+
+configure_file("c++_config_site") {
+  source = "//buildtools/third_party/libc++/__config_site"
+  output = "$target_gen_dir/c++/__config_site"
+
+  prepend = [ "// The definitions that the GN arguments of the build set." ]
+
+  foreach(define, libcxx_config_site_defines) {
+    prepend += [ "#define $define" ]
+  }
+
+  prepend += [ "" ]
+}
+
+copy_headers("c++_headers") {
+  output = "$package_dir/c++/include"
+
+  _config_site = get_target_outputs(":c++_config_site")
+
+  files = [
+    [
+      "$libcxx_prefix/include",
+      libcxx_headers,
+    ],
+    [
+      "//buildtools/third_party/libc++",
+      [ "//buildtools/third_party/libc++/__assertion_handler" ],
+    ],
+    [
+      get_path_info(_config_site[0], "dir"),
+      _config_site,
+    ],
+  ]
+
+  # Windows uses the C++ ABI of MSVC rather than libc++abi.
+  if (!is_win) {
+    files += [ [
+          "$libcxxabi_prefix/include",
+          [
+            "$libcxxabi_prefix/include/__cxxabi_config.h",
+            "$libcxxabi_prefix/include/cxxabi.h",
+          ],
+        ] ]
+  }
+
+  inputs = []
+
+  foreach(entry, files) {
+    inputs += entry[1]
+  }
+
+  deps = [ ":c++_config_site" ]
+}
+
+copy_headers("v8_headers") {
+  output = "$package_dir/v8/include"
+
+  _v8_gn = "$root_gen_dir/v8/include/v8-gn.h"
+
+  # The headers are copied from the directory rather than listed, so that the
+  # list follows V8.
+  trees = [ "//v8/include" ]
+
+  files = [ [
+        get_path_info(_v8_gn, "dir"),
+        [ _v8_gn ],
+      ] ]
+
+  # `v8-gn.h` is generated by a target that is private to `//v8`, so depend on
+  # the library that is compiled against it. The depfile picks up later
+  # changes.
+  deps = [ "//v8" ]
+}
+
+config("c++_public") {
+  include_dirs = [ "$package_dir/c++/include" ]
+  cflags = libcxx_public_cflags
+  cflags_cc = libcxx_public_cflags_cc
+  ldflags = libcxx_public_ldflags
+}
+
+config("v8_public") {
+  include_dirs = [ "$package_dir/v8/include" ]
+  defines = v8_public_defines
+  cflags_cc = v8_public_cflags_cc
+  libs = v8_public_libs
+  frameworks = v8_public_frameworks
+}
+
 static_prebuild("c++") {
   visibility = [ ":*" ]
 
+  output_dir = "$package_dir/c++/lib"
+
   deps = [ "//buildtools/third_party/libc++" ]
 
-  include_dirs = [
-    "//third_party/libc++/src/include",
-    "//buildtools/third_party/libc++",
-  ]
+  public_deps = [ ":c++_headers" ]
+
+  public_configs = [ ":c++_public" ]
 }
 
 static_prebuild("v8") {
-  deps = [
+  output_dir = "$package_dir/v8/lib"
+
+  deps = [ "//v8" ]
+
+  public_deps = [
     ":c++",
-    "//v8:v8",
+    ":v8_headers",
+  ]
+
+  public_configs = [ ":v8_public" ]
+}
+
+configure_file("c++_config") {
+  source = "cmake/c++-config.cmake.in"
+  output = "$package_dir/c++/lib/cmake/c++/c++-config.cmake"
+
+  _compile_options = libcxx_public_cflags
+  foreach(flag, libcxx_public_cflags_cc) {
+    _compile_options += [ "\$<\$<COMPILE_LANGUAGE:CXX>:$flag>" ]
+  }
+
+  substitutions = [
+    [
+      "VERSION",
+      package_version,
+    ],
+    [
+      "COMPILE_OPTIONS",
+      string_join(";", _compile_options),
+    ],
+    [
+      "LINK_OPTIONS",
+      string_join(";", libcxx_public_ldflags),
+    ],
   ]
 }
 
+configure_file("v8_config") {
+  source = "cmake/v8-config.cmake.in"
+  output = "$package_dir/v8/lib/cmake/v8/v8-config.cmake"
+
+  _compile_options = []
+  foreach(flag, v8_public_cflags_cc) {
+    _compile_options += [ "\$<\$<COMPILE_LANGUAGE:CXX>:$flag>" ]
+  }
+
+  _link_libraries = v8_public_libs
+  foreach(framework, v8_public_frameworks) {
+    _name = get_path_info(framework, "name")
+    _link_libraries += [ "\$<LINK_LIBRARY:FRAMEWORK,$_name>" ]
+  }
+
+  substitutions = [
+    [
+      "VERSION",
+      package_version,
+    ],
+    [
+      "COMPILE_DEFINITIONS",
+      string_join(";", v8_public_defines),
+    ],
+    [
+      "COMPILE_OPTIONS",
+      string_join(";", _compile_options),
+    ],
+    [
+      "LINK_LIBRARIES",
+      string_join(";", _link_libraries),
+    ],
+  ]
+}
+
+foreach(package,
+        [
+          "c++",
+          "v8",
+        ]) {
+  configure_file("${package}_config_version") {
+    source = "cmake/config-version.cmake.in"
+    output =
+        "$package_dir/$package/lib/cmake/$package/$package-config-version.cmake"
+
+    substitutions = [
+      [
+        "VERSION",
+        package_version,
+      ],
+      [
+        "SIZEOF_VOID_P",
+        sizeof_void_p,
+      ],
+    ]
+  }
+}
+
+# Writes the licenses of the third-party code that the target depends on, as
+# listed by the `README.chromium` files of Chromium. Code outside of
+# `//third_party`, or without such a file, is only included when listed in
+# `extra_dirs`.
+template("third_party_licenses") {
+  action(target_name) {
+    visibility = [ ":*" ]
+
+    script = "//tools/licenses/licenses.py"
+
+    outputs = [ invoker.output ]
+
+    depfile = "$target_gen_dir/$target_name.d"
+
+    args = [
+      "license_file",
+      rebase_path(invoker.output, root_build_dir),
+      "--gn-target",
+      get_label_info(invoker.gn_target, "label_no_toolchain"),
+      "--gn-out-dir",
+      ".",
+      "--target-os",
+      target_os,
+      "--depfile",
+      rebase_path(depfile, root_build_dir),
+    ]
+
+    if (defined(invoker.extra_dirs)) {
+      args += [
+        "--extra-third-party-dirs",
+        "[\"" + string_join("\",\"", invoker.extra_dirs) + "\"]",
+      ]
+    }
+  }
+}
+
+third_party_licenses("c++_licenses") {
+  gn_target = ":c++"
+  output = "$package_dir/c++/share/licenses/c++/THIRD_PARTY_LICENSES"
+
+  # libc++ is built from `//buildtools/third_party/libc++`, which has no
+  # `README.chromium` of its own.
+  extra_dirs = [
+    "third_party/libc++",
+    "third_party/libc++abi",
+  ]
+}
+
+third_party_licenses("v8_licenses") {
+  gn_target = "//v8:v8"
+  output = "$package_dir/v8/share/licenses/v8/THIRD_PARTY_LICENSES"
+}
+
+# V8 has no `README.chromium`, so its own licenses are copied as is.
+copy("v8_own_licenses") {
+  visibility = [ ":*" ]
+
+  sources = [
+    "//v8/LICENSE",
+    "//v8/LICENSE.fdlibm",
+    "//v8/LICENSE.strongtalk",
+    "//v8/LICENSE.v8",
+  ]
+
+  outputs = [ "$package_dir/v8/share/licenses/v8/{{source_file_part}}" ]
+}
+
 group("prebuilds") {
-  deps = [ ":v8" ]
+  deps = [
+    ":c++_config",
+    ":c++_config_version",
+    ":c++_licenses",
+    ":v8",
+    ":v8_config",
+    ":v8_config_version",
+    ":v8_licenses",
+    ":v8_own_licenses",
+  ]
 }
