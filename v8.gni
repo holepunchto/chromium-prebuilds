@@ -13,6 +13,13 @@ v8_enable_gdbjit = false
 # https://gn.issues.chromium.org/issues/42440276
 v8_enable_temporal_support = false
 
+# Disable Perfetto, which V8 would otherwise write trace events to directly.
+# Embedders would then need to link the same version of Perfetto to observe
+# them, and the public headers would include Perfetto headers that aren't
+# packaged. Without it, trace events go through the `TracingController` of the
+# embedder.
+v8_use_perfetto = false
+
 # Enable the monolithic V8 build.
 v8_monolithic = true
 
