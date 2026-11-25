@@ -107,7 +107,14 @@ if (is_linux) {
 } else if (is_android) {
   v8_public_libs += [ "log" ]
 } else if (is_apple) {
-  v8_public_frameworks += [ "Foundation.framework" ]
+  v8_public_frameworks += [
+    "CoreFoundation.framework",
+    "Foundation.framework",
+  ]
+
+  if (is_mac) {
+    v8_public_frameworks += [ "Security.framework" ]
+  }
 } else if (is_win) {
   v8_public_libs += [
     "dbghelp.lib",

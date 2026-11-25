@@ -20,6 +20,19 @@ v8_enable_temporal_support = false
 # embedder.
 v8_use_perfetto = false
 
+# Disable recording trace events to the tracing system of the OS, which V8
+# enables on macOS and Windows when Perfetto is disabled.
+v8_enable_system_instrumentation = false
+
+# Disable ETW stack walking on Windows, which registers an ETW provider when V8
+# is initialized.
+v8_enable_etw_stack_walking = false
+
+# Disable zlib, which V8 only uses for the checksums of snapshots and code
+# caches. These are only verified in debug builds by default, and V8 has its
+# own checksum to use instead.
+v8_use_zlib = false
+
 # Enable the monolithic V8 build.
 v8_monolithic = true
 
