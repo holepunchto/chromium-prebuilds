@@ -56,13 +56,6 @@ jobs:
 
           mkdir -p chromium
 
-      - id: git-cache
-        uses: holepunchto/actions/cache/restore@v1
-        with:
-          path: .git_cache
-          key: git-cache-linux-${{ needs.version.outputs.version }}
-          restore-keys: git-cache-linux-
-
       - name: Download
         working-directory: chromium
         run: |
@@ -80,7 +73,7 @@ jobs:
           ]
           target_os = ["linux", "android"]
           target_cpu = ["x64", "x86", "arm64", "arm"]
-          cache_dir = "$GITHUB_WORKSPACE/.git_cache"
+          cache_dir = "${HOLEPUNCH_GIT_CACHE:-$GITHUB_WORKSPACE/.git_cache}"
           EOF
 
           if [ -d src/.git ]; then
@@ -96,12 +89,6 @@ jobs:
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
           fi
-
-      - if: steps.git-cache.outputs.cache-hit != 'true'
-        uses: holepunchto/actions/cache/save@v1
-        with:
-          path: .git_cache
-          key: git-cache-linux-${{ needs.version.outputs.version }}
 
       - name: Patch
         working-directory: chromium
@@ -209,13 +196,6 @@ jobs:
 
           mkdir -p chromium
 
-      - id: git-cache
-        uses: holepunchto/actions/cache/restore@v1
-        with:
-          path: .git_cache
-          key: git-cache-apple-${{ needs.version.outputs.version }}
-          restore-keys: git-cache-apple-
-
       - name: Download
         working-directory: chromium
         run: |
@@ -233,7 +213,7 @@ jobs:
           ]
           target_os = ["mac", "ios"]
           target_cpu = ["x64", "arm64"]
-          cache_dir = "$GITHUB_WORKSPACE/.git_cache"
+          cache_dir = "${HOLEPUNCH_GIT_CACHE:-$GITHUB_WORKSPACE/.git_cache}"
           EOF
 
           if [ -d src/.git ]; then
@@ -246,12 +226,6 @@ jobs:
           if [ ! -d "buildtools" ]; then
             ln -s src/buildtools buildtools
           fi
-
-      - if: steps.git-cache.outputs.cache-hit != 'true'
-        uses: holepunchto/actions/cache/save@v1
-        with:
-          path: .git_cache
-          key: git-cache-apple-${{ needs.version.outputs.version }}
 
       - name: Patch
         working-directory: chromium
@@ -351,13 +325,6 @@ jobs:
 
           New-Item -ItemType Directory -Force -Path "chromium" | Out-Null
 
-      - id: git-cache
-        uses: holepunchto/actions/cache/restore@v1
-        with:
-          path: .git_cache
-          key: git-cache-windows-${{ needs.version.outputs.version }}
-          restore-keys: git-cache-windows-
-
       - name: Download
         working-directory: chromium
         run: |
@@ -375,8 +342,15 @@ jobs:
           ]
           target_os = ["win"]
           target_cpu = ["x64", "arm64"]
-          cache_dir = r"${{ github.workspace }}\.git_cache"
           '@ | Out-File -FilePath ".gclient" -Encoding utf8
+
+          if ($env:HOLEPUNCH_GIT_CACHE) {
+              $cacheDir = $env:HOLEPUNCH_GIT_CACHE
+          } else {
+              $cacheDir = "$env:GITHUB_WORKSPACE\.git_cache"
+          }
+
+          Add-Content -Path ".gclient" -Value "cache_dir = r`"$cacheDir`""
 
           if (Test-Path "src/.git" -PathType Container) {
               New-Item -ItemType Directory -Force -Path "src/.git/info" | Out-Null
@@ -393,12 +367,6 @@ jobs:
           if (-not (Test-Path "buildtools" -PathType Container)) {
               New-Item -ItemType Junction -Path "buildtools" -Target (Resolve-Path "src/buildtools").Path | Out-Null
           }
-
-      - if: steps.git-cache.outputs.cache-hit != 'true'
-        uses: holepunchto/actions/cache/save@v1
-        with:
-          path: .git_cache
-          key: git-cache-windows-${{ needs.version.outputs.version }}
 
       - name: Patch
         working-directory: chromium
