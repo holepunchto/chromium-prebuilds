@@ -111,10 +111,6 @@ if (is_linux) {
     "CoreFoundation.framework",
     "Foundation.framework",
   ]
-
-  if (is_mac) {
-    v8_public_frameworks += [ "Security.framework" ]
-  }
 } else if (is_win) {
   v8_public_libs += [
     "dbghelp.lib",
