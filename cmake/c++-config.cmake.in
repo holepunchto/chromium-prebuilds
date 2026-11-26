@@ -14,17 +14,6 @@ set_target_properties(
   INTERFACE_COMPILE_OPTIONS "@COMPILE_OPTIONS@"
 )
 
-# The headers must be searched before those of the compiler, which clang-cl
-# only does for include directories that aren't system include directories.
-# Chromium passes them the same way on Windows.
-if(WIN32)
-  set_target_properties(
-    c++::headers
-    PROPERTIES
-    SYSTEM OFF
-  )
-endif()
-
 add_library(c++::static STATIC IMPORTED)
 
 set_target_properties(
@@ -35,5 +24,31 @@ set_target_properties(
   INTERFACE_LINK_LIBRARIES c++::headers
   INTERFACE_LINK_OPTIONS "@LINK_OPTIONS@"
 )
+
+if(WIN32)
+  # The headers must be searched before those of the compiler, which clang-cl
+  # only does for include directories that aren't system include directories.
+  # Chromium passes them the same way on Windows.
+  set_target_properties(
+    c++::headers
+    PROPERTIES
+    SYSTEM OFF
+  )
+
+  # Every object in a program must use the same C runtime, so link the C++
+  # runtime that matches the one the consumer selects, and leave out the other
+  # C runtime that the prebuilt objects ask for.
+  set(_cxx_debug "$<STREQUAL:$<GENEX_EVAL:$<TARGET_PROPERTY:MSVC_RUNTIME_LIBRARY>>,MultiThreadedDebug>")
+
+  set_property(
+    TARGET c++::static
+    APPEND
+    PROPERTY INTERFACE_LINK_OPTIONS
+      "/DEFAULTLIB:libcpmt$<${_cxx_debug}:d>"
+      "/NODEFAULTLIB:libcmt$<$<NOT:${_cxx_debug}>:d>"
+  )
+
+  unset(_cxx_debug)
+endif()
 
 unset(_cxx_prefix)

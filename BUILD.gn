@@ -66,20 +66,10 @@ if (!is_asan) {
   libcxx_config_site_defines += [ "__SANITIZER_DISABLE_CONTAINER_OVERFLOW__ 1" ]
 }
 
-libcxx_public_cflags = []
 libcxx_public_cflags_cc = []
 libcxx_public_ldflags = []
 
-if (is_win) {
-  # Matches `//build/config/win:static_crt`.
-  if (is_debug) {
-    libcxx_public_cflags += [ "/MTd" ]
-    libcxx_public_ldflags += [ "/DEFAULTLIB:libcpmtd.lib" ]
-  } else {
-    libcxx_public_cflags += [ "/MT" ]
-    libcxx_public_ldflags += [ "/DEFAULTLIB:libcpmt.lib" ]
-  }
-} else {
+if (!is_win) {
   libcxx_public_cflags_cc += [ "-nostdinc++" ]
   libcxx_public_ldflags += [ "-nostdlib++" ]
 }
@@ -348,7 +338,6 @@ copy_headers("v8_headers") {
 
 config("c++_public") {
   include_dirs = [ "$package_dir/c++/include" ]
-  cflags = libcxx_public_cflags
   cflags_cc = libcxx_public_cflags_cc
   ldflags = libcxx_public_ldflags
 }
@@ -390,7 +379,7 @@ configure_file("c++_config") {
   source = "cmake/c++-config.cmake.in"
   output = "$package_dir/c++/lib/cmake/c++/c++-config.cmake"
 
-  _compile_options = libcxx_public_cflags
+  _compile_options = []
   foreach(flag, libcxx_public_cflags_cc) {
     _compile_options += [ "\$<\$<COMPILE_LANGUAGE:CXX>:$flag>" ]
   }
