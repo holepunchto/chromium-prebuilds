@@ -33,6 +33,11 @@ v8_enable_etw_stack_walking = false
 # own checksum to use instead.
 v8_use_zlib = false
 
+# Disable snapshot compression, which V8 enables on Android and which depends
+# on zlib. The snapshot is instead embedded uncompressed, so that it needn't be
+# decompressed when each isolate is created.
+v8_enable_snapshot_compression = false
+
 # Enable the monolithic V8 build.
 v8_monolithic = true
 
