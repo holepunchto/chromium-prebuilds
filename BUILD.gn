@@ -127,6 +127,16 @@ if (is_linux) {
   }
 }
 
+# The file names that static libraries are written with, which the CMake
+# packages refer to.
+if (is_win) {
+  static_library_prefix = ""
+  static_library_extension = ".lib"
+} else {
+  static_library_prefix = "lib"
+  static_library_extension = ".a"
+}
+
 template("static_prebuild") {
   static_library(target_name) {
     complete_static_lib = true
@@ -389,6 +399,10 @@ configure_file("c++_config") {
       package_version,
     ],
     [
+      "LIBRARY",
+      "${static_library_prefix}c++${static_library_extension}",
+    ],
+    [
       "COMPILE_OPTIONS",
       string_join(";", _compile_options),
     ],
@@ -418,6 +432,10 @@ configure_file("v8_config") {
     [
       "VERSION",
       package_version,
+    ],
+    [
+      "LIBRARY",
+      "${static_library_prefix}v8${static_library_extension}",
     ],
     [
       "COMPILE_DEFINITIONS",

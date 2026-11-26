@@ -19,7 +19,7 @@ add_library(c++::static STATIC IMPORTED)
 set_target_properties(
   c++::static
   PROPERTIES
-  IMPORTED_LOCATION "${_cxx_prefix}/lib/libc++${CMAKE_STATIC_LIBRARY_SUFFIX}"
+  IMPORTED_LOCATION "${_cxx_prefix}/lib/@LIBRARY@"
   IMPORTED_LINK_INTERFACE_LANGUAGES CXX
   INTERFACE_LINK_LIBRARIES c++::headers
   INTERFACE_LINK_OPTIONS "@LINK_OPTIONS@"
