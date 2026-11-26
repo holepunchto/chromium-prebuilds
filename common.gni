@@ -10,6 +10,12 @@ dcheck_always_on = false
 # into single archives.
 is_component_build = false
 
+# Disable the allocator shim, which would otherwise replace malloc() and
+# operator new with PartitionAlloc in any program or library that links a
+# prebuild. Memory allocated by a library would then be freed with a
+# different allocator by the program that links it.
+use_allocator_shim = false
+
 # Don't use a separate data file for ICU, but embed it statically instead.
 # This increases executable size, but simplifies distribution.
 icu_use_data_file = false
