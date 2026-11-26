@@ -16,6 +16,11 @@ is_component_build = false
 # different allocator by the program that links it.
 use_allocator_shim = false
 
+# Disable the features that Chromium only supports when PartitionAlloc replaces
+# malloc() through the allocator shim.
+enable_backup_ref_ptr_support = false
+use_alloc_token = false
+
 # Don't use a separate data file for ICU, but embed it statically instead.
 # This increases executable size, but simplifies distribution.
 icu_use_data_file = false
