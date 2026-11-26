@@ -14,6 +14,17 @@ set_target_properties(
   INTERFACE_COMPILE_OPTIONS "@COMPILE_OPTIONS@"
 )
 
+# The headers must be searched before those of the compiler, which clang-cl
+# only does for include directories that aren't system include directories.
+# Chromium passes them the same way on Windows.
+if(WIN32)
+  set_target_properties(
+    c++::headers
+    PROPERTIES
+    SYSTEM OFF
+  )
+endif()
+
 add_library(c++::static STATIC IMPORTED)
 
 set_target_properties(

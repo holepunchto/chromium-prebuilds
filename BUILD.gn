@@ -87,6 +87,12 @@ if (is_win) {
 v8_public_defines = [ "V8_GN_HEADER" ]
 
 if (is_win) {
+  # The headers break if <windows.h> defines min() and max() macros before they
+  # are included. Matches `//build/config/win:nominmax`.
+  v8_public_defines += [ "NOMINMAX" ]
+}
+
+if (is_win) {
   v8_public_cflags_cc = [ "/GR-" ]
 } else {
   v8_public_cflags_cc = [ "-fno-rtti" ]
